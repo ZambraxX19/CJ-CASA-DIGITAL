@@ -54,7 +54,7 @@ background-image: url(‘data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBD
 background-size: cover;
 background-position: center top;
 background-repeat: no-repeat;
-background-attachment: fixed;
+background-attachment: scroll;
 color: var(–white);
 font-family: ‘DMSans’, ‘Segoe UI’, sans-serif;
 font-weight: 300;
@@ -67,8 +67,8 @@ overflow-x: hidden;
 /* overlay oscuro sobre el fondo para legibilidad */
 body::before{
 content:’’;
-position:fixed;
-inset:0;
+position:absolute;
+inset:-1;
 background: rgba(7,8,12,0.82);
 z-index:0;
 pointer-events:none;
