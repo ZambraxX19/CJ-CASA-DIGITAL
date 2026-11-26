@@ -9,7 +9,9 @@ const CJ_CONFIG = { pixelId: "" };
 
    Cómo se arma el precio: solo los contenidos cuestan `porContenido` cada uno, y encima se suma lo que la persona marque.
    "Plan completo" = contenidos + estrategia del mes + manejo de una red + pauta básica
-   (Plan 8: $2.500.000 · Plan 12: $3.500.000 · Plan 15: $4.250.000). */
+   (Plan 8: $2.500.000 · Plan 12: $3.500.000 · Plan 15: $4.250.000).
+   Lo de "¿Algo más para tu negocio?" (página web, automatización, capacitación, portafolio) no tiene precio aquí:
+   se cotiza en el diagnóstico y solo viaja en el mensaje de WhatsApp. */
 const CJ_PLAN = {
   whatsapp: "573052007745",
   porContenido: 200000,     // cada video, carrusel o estática, al mes
@@ -31,7 +33,7 @@ const CJ_PLAN = {
     basica:   { nombre: "Pauta básica", precio: 250000 },
     completa: { nombre: "Pauta completa", precio: 1000000 }
   },
-  avatar: { precio: 1500000, videosIncluidos: 4, videoAdicional: 250000 },
+  videoConIA: 250000,       // cada video del plan que se haga con IA, al mes (la persona escoge cuántos, desde uno)
   speak: {                  // una sola vez
     pro:    { nombre: "Speak Pro", precio: 800000 },
     promax: { nombre: "Speak Pro Max", precio: 1600000 }
@@ -77,7 +79,7 @@ const CJ_PLAN = {
   function cuantos(n, uno, varios) { return n + " " + (n === 1 ? uno : varios); }
   function mezclaTexto(e) {
     var partes = [];
-    if (e.videos) partes.push(cuantos(e.videos, "video", "videos"));
+    if (e.videos) partes.push(cuantos(e.videos, "video", "videos") + (e.videosIA ? ", " + e.videosIA + " de ellos con IA" : ""));
     if (e.carruseles) partes.push(cuantos(e.carruseles, "carrusel", "carruseles"));
     if (e.estaticas) partes.push(cuantos(e.estaticas, "estática", "estáticas"));
     return enLista(partes);
@@ -88,8 +90,9 @@ const CJ_PLAN = {
   var inicial = P.atajos[P.inicial];
   var estado = {
     videos: inicial.videos, carruseles: inicial.carruseles, estaticas: inicial.estaticas,
-    estrategia: false, redes: [], pauta: "ninguna",
-    avatar: false, avatarVideos: P.avatar.videosIncluidos, speak: "ninguno"
+    videosIA: 0,             // cuántos de los videos del plan se hacen con IA
+    estrategia: false, redes: [], pauta: "ninguna", speak: "ninguno",
+    interes: []              // otros servicios que le interesan: no cambian el total
   };
 
   function total(e) { return e.videos + e.carruseles + e.estaticas; }
@@ -97,11 +100,9 @@ const CJ_PLAN = {
   function precioPrimeraRed(n) { return P.redes.porContenido * n; }
   function precioCompleto(n) { return precioSolo(n) + P.estrategia + precioPrimeraRed(n) + P.pauta.basica.precio; }
 
-  /* Deja el estado dentro de las reglas: avatar solo con 4 videos o más y sin pasar de los videos del plan. */
+  /* Deja el estado dentro de las reglas: los videos con IA no pasan de los videos del plan. */
   function normalizar(e) {
-    if (e.videos < P.avatar.videosIncluidos) e.avatar = false;
-    e.avatarVideos = Math.max(P.avatar.videosIncluidos, Math.min(e.avatarVideos, Math.max(e.videos, P.avatar.videosIncluidos)));
-    if (!e.avatar) e.avatarVideos = P.avatar.videosIncluidos;
+    e.videosIA = Math.max(0, Math.min(e.videosIA, e.videos));
     if (!P.pauta[e.pauta]) e.pauta = "ninguna";
     e.redes = ORDEN_REDES.filter(function (r) { return e.redes.indexOf(r) > -1; });
     return e;
@@ -117,6 +118,11 @@ const CJ_PLAN = {
     var mensual = contenidos;
     var unaVez = 0;
     lineas.push({ id: "plan", texto: cuantos(n, "contenido", "contenidos") + " y " + cuantos(n, "historia", "historias"), valor: contenidos });
+    if (e.videosIA) {
+      var conIA = P.videoConIA * e.videosIA;
+      mensual += conIA;
+      lineas.push({ id: "ia", texto: cuantos(e.videosIA, "video con IA", "videos con IA"), valor: conIA });
+    }
 
     if (e.estrategia) {
       mensual += P.estrategia;
@@ -137,13 +143,6 @@ const CJ_PLAN = {
       incluye.push(P.pauta[e.pauta].nombre.toLowerCase());
     } else falta.push("la pauta básica");
 
-    if (e.avatar) {
-      var extra = Math.max(0, e.avatarVideos - P.avatar.videosIncluidos);
-      var avatar = P.avatar.precio + P.avatar.videoAdicional * extra;
-      mensual += avatar;
-      lineas.push({ id: "avatar", texto: "Avatar con IA, " + cuantos(e.avatarVideos, "video", "videos"), valor: avatar });
-      otros.push("avatar con IA (" + cuantos(e.avatarVideos, "video", "videos") + ")");
-    }
     if (P.speak[e.speak]) {
       unaVez += P.speak[e.speak].precio;
       lineas.push({ id: "speak", texto: P.speak[e.speak].nombre, valor: P.speak[e.speak].precio, unaVez: true });
@@ -154,7 +153,7 @@ const CJ_PLAN = {
     return {
       total: n, base: "Plan " + n, completo: completo, nombre: "Plan " + n + (completo ? " completo" : ""),
       mezcla: mezclaTexto(e), contenidos: contenidos, precioCompleto: precioCompleto(n), primeraRed: precioPrimeraRed(n),
-      lineas: lineas, incluye: incluye, otros: otros, falta: falta,
+      lineas: lineas, incluye: incluye, otros: otros, falta: falta, interes: e.interes.slice(),
       mensual: mensual, unaVez: unaVez, primerMes: mensual + unaVez,
       conAdicionalesAlMes: mensual > contenidos,
       completoJusto: completo && mensual === precioCompleto(n)   // el plan completo tal cual, sin nada de más
@@ -182,6 +181,7 @@ const CJ_PLAN = {
     m += " Mensual: " + pesos(c.mensual) + ".";
     if (c.unaVez) m += " Una sola vez: " + pesos(c.unaVez) + ".";
     m += " Quiero mi diagnóstico de 15 minutos.";
+    if (c.interes.length) m += " También me interesa: " + enLista(c.interes) + ".";
     return m;
   }
 
@@ -210,19 +210,21 @@ const CJ_PLAN = {
 
   function pintarFichas(e, c) {
     var caja = $("fichas"); if (!caja) return;
-    var clave = e.videos + "-" + e.carruseles + "-" + e.estaticas;
+    var clave = e.videos + "-" + e.carruseles + "-" + e.estaticas + "-" + e.videosIA;
     if (clave === fichasAntes) return;
     var antes = fichasAntes ? fichasAntes.split("-").map(Number) : null;
     fichasAntes = clave;
     var html = "", orden = ["videos", "carruseles", "estaticas"];
     orden.forEach(function (tipo, i) {
       for (var k = 0; k < e[tipo]; k++) {
-        var nueva = antes && k >= antes[i] ? " nueva" : "";
-        html += '<span class="ficha-t ' + TIPOS[tipo][0] + nueva + '"><svg class="ic" aria-hidden="true"><use href="#' + TIPOS[tipo][1] + '"/></svg></span>';
+        var conIA = tipo === "videos" && k < e.videosIA;   // los videos con IA van primero, con su destello
+        var nueva = antes && (k >= antes[i] || (tipo === "videos" && conIA !== (k < antes[3]))) ? " nueva" : "";
+        html += '<span class="ficha-t ' + (conIA ? "ia" : TIPOS[tipo][0]) + nueva + '"><svg class="ic" aria-hidden="true"><use href="#' + (conIA ? "i-chispa" : TIPOS[tipo][1]) + '"/></svg></span>';
       }
     });
     caja.innerHTML = html;
     caja.setAttribute("aria-label", c.mezcla);
+    if ($("fichas-ley")) $("fichas-ley").hidden = !e.videosIA;
   }
   function texto(id, valor) { var el = $(id); if (el && el.textContent !== valor) el.textContent = valor; }
 
@@ -269,14 +271,15 @@ const CJ_PLAN = {
     todos('input[name="pauta"]').forEach(function (i) { i.checked = i.value === estado.pauta; });
     todos('input[name="speak"]').forEach(function (i) { i.checked = i.value === estado.speak; });
 
-    var avatarSi = estado.videos >= P.avatar.videosIncluidos;
-    if ($("in-avatar")) { $("in-avatar").checked = estado.avatar; $("in-avatar").disabled = !avatarSi; }
-    if ($("env-avatar")) $("env-avatar").classList.toggle("no", !avatarSi);
-    if ($("av-aviso")) $("av-aviso").hidden = avatarSi;
-    if ($("sub-avatar")) $("sub-avatar").hidden = !estado.avatar;
-    texto("n-avatar", String(estado.avatarVideos));
-    if ($("av-menos")) $("av-menos").disabled = estado.avatarVideos <= P.avatar.videosIncluidos;
-    if ($("av-mas")) $("av-mas").disabled = estado.avatarVideos >= estado.videos;
+    todos("[data-interes]").forEach(function (i) { i.checked = estado.interes.indexOf(i.getAttribute("data-interes")) > -1; });
+
+    // Videos con IA: de 0 a los videos del plan
+    var hayVideos = estado.videos > 0;
+    texto("n-ia", String(estado.videosIA));
+    if ($("ia-menos")) $("ia-menos").disabled = estado.videosIA <= 0;
+    if ($("ia-mas")) $("ia-mas").disabled = !hayVideos || estado.videosIA >= estado.videos;
+    if ($("ia-fila")) $("ia-fila").classList.toggle("no", !hayVideos);
+    if ($("ia-aviso")) $("ia-aviso").hidden = hayVideos;
 
     // Resultado
     texto("r-nombre", c.base);
@@ -301,15 +304,34 @@ const CJ_PLAN = {
       }).join("");
       lineasAntes = vistas;
     }
-    ponerPesos($("r-mensual"), c.mensual);
-    ponerPesos($("r-primer"), c.primerMes);
-    if ($("r-unavez-fila")) $("r-unavez-fila").hidden = !c.unaVez;
+    // El número grande: el total al mes o, si hay algo de una sola vez, el primer mes (y debajo, lo que sigue cada mes)
+    var conUnaVez = c.unaVez > 0;
+    texto("r-rotulo", conUnaVez ? "Tu primer mes" : "Total al mes");
+    ponerPesos($("r-grande"), conUnaVez ? c.primerMes : c.mensual);
+    if ($("r-despues")) $("r-despues").hidden = !conUnaVez;
+    texto("r-mensual", pesos(c.mensual));
+    if ($("r-unavez-fila")) $("r-unavez-fila").hidden = !conUnaVez;
     texto("r-unavez", pesos(c.unaVez));
-    texto("r-vivo", c.nombre + ". Total al mes: " + pesos(c.mensual) + "." + (c.unaVez ? " Una sola vez: " + pesos(c.unaVez) + "." : ""));
+    var res = d.querySelector(".resumen");
+    if (res) { res.setAttribute("data-mensual", c.mensual); res.setAttribute("data-una-vez", c.unaVez); }
+    var interes = $("r-interes");
+    if (interes) {
+      var quiere = c.interes.length ? "También me interesa: " + enLista(c.interes) + "." : "";
+      interes.hidden = !quiere;
+      if (interes.textContent !== quiere) interes.textContent = quiere;
+    }
+    texto("r-vivo", c.nombre + ". " + (conUnaVez ? "Tu primer mes: " + pesos(c.primerMes) + ". Después, " + pesos(c.mensual) + " al mes." : "Total al mes: " + pesos(c.mensual) + "."));
 
     // Barra del celular y enlaces de WhatsApp con el plan
-    texto("pb-nombre", c.completoJusto ? c.nombre : (c.conAdicionalesAlMes ? "Total al mes" : c.base + " · al mes"));
-    ponerPesos($("pb-total"), c.mensual);
+    var rotuloBarra = conUnaVez ? "Primer mes" : (c.completoJusto ? c.nombre : (c.conAdicionalesAlMes ? "Total al mes" : c.base + " · al mes"));
+    var barra = $("plan-barra");
+    if (barra && !primeraVez && $("pb-nombre") && $("pb-nombre").textContent !== rotuloBarra && !sinMovimiento) {
+      barra.classList.remove("pulso"); void barra.offsetWidth; barra.classList.add("pulso");   // que el cambio se note
+    }
+    texto("pb-nombre", rotuloBarra);
+    ponerPesos($("pb-total"), conUnaVez ? c.primerMes : c.mensual);
+    if ($("pb-despues")) $("pb-despues").hidden = !conUnaVez;
+    texto("pb-mensual", pesos(c.mensual));
     var enlace = enlaceWa(mensajePlan(estado, c));
     todos("[data-plan-wa]").forEach(function (a) { a.href = enlace; });
 
@@ -329,15 +351,14 @@ const CJ_PLAN = {
       desde: precioSolo(P.minimo), desdeCompleto: precioCompleto(P.minimo),
       estrategia: P.estrategia, redAdicional: P.redes.adicional,
       pautaBasica: P.pauta.basica.precio, pautaCompleta: P.pauta.completa.precio,
-      avatar: P.avatar.precio, avatarVideo: P.avatar.videoAdicional,
+      videoIA: P.videoConIA,
       speakPro: P.speak.pro.precio, speakProMax: P.speak.promax.precio
     };
     todos("[data-p]").forEach(function (el) { var k = el.getAttribute("data-p"); if (k in mapa) el.textContent = pesos(mapa[k]); });
     todos("[data-plan-solo]").forEach(function (el) { el.textContent = pesos(precioSolo(Number(el.getAttribute("data-plan-solo")))); });
     todos("[data-plan-completo]").forEach(function (el) { el.textContent = pesos(precioCompleto(Number(el.getAttribute("data-plan-completo")))); });
-    todos('[data-n="avatarIncluidos"]').forEach(function (el) { el.textContent = P.avatar.videosIncluidos; });
-    var general = enlaceWa(P.mensajeGeneral);
-    todos("a[data-wa]:not([data-plan-wa])").forEach(function (a) { a.href = general; });
+    // Enlaces a WhatsApp que no llevan el plan: el mensaje general, o el propio de cada servicio (data-msg)
+    todos("a[data-wa]:not([data-plan-wa])").forEach(function (a) { a.href = enlaceWa(a.getAttribute("data-msg") || P.mensajeGeneral); });
   }
 
   /* ---------- Acciones ---------- */
@@ -387,12 +408,17 @@ const CJ_PLAN = {
     todos('input[name="pauta"]').forEach(function (i) {
       i.addEventListener("change", function () { if (i.checked) { estado.pauta = i.value; cambio(); } });
     });
-    if ($("in-avatar")) $("in-avatar").addEventListener("change", function () { estado.avatar = $("in-avatar").checked; cambio(); });
+    if ($("ia-menos")) $("ia-menos").addEventListener("click", function () { if (estado.videosIA > 0) { estado.videosIA -= 1; cambio(); } });
+    if ($("ia-mas")) $("ia-mas").addEventListener("click", function () { if (estado.videosIA < estado.videos) { estado.videosIA += 1; cambio(); } });
+    todos("[data-interes]").forEach(function (i) {
+      i.addEventListener("change", function () {
+        estado.interes = todos("[data-interes]").filter(function (x) { return x.checked; }).map(function (x) { return x.getAttribute("data-interes"); });
+        cambio();
+      });
+    });
     todos('input[name="speak"]').forEach(function (i) {
       i.addEventListener("change", function () { if (i.checked) { estado.speak = i.value; cambio(); } });
     });
-    if ($("av-menos")) $("av-menos").addEventListener("click", function () { estado.avatarVideos -= 1; cambio(); });
-    if ($("av-mas")) $("av-mas").addEventListener("click", function () { if (estado.avatarVideos < estado.videos) { estado.avatarVideos += 1; cambio(); } });
 
     // Tarjetas de planes: cargan el plan en el cotizador y bajan hasta él
     todos("[data-elegir]").forEach(function (b) {
