@@ -138,7 +138,9 @@ const CJ_PLAN = {
       adicionales.push(P.speak[e.speak].nombre);
     }
     return { total: n, nombre: "Growth " + n, mezcla: mezclaTexto(e), plan: plan, lineas: lineas, adicionales: adicionales,
-             mensual: mensual, unaVez: unaVez, primerMes: mensual + unaVez };
+             mensual: mensual, unaVez: unaVez, primerMes: mensual + unaVez,
+             conAdicionalesAlMes: mensual > plan,   // el total ya no es solo el plan: el rótulo pasa a "Total al mes"
+             desde: !!e.pauta };                    // la gestión de pauta es "desde": el total también
   }
 
   /* ---------- WhatsApp ---------- */
@@ -264,17 +266,19 @@ const CJ_PLAN = {
     }
     ponerPesos($("r-mensual"), c.mensual);
     ponerPesos($("r-primer"), c.primerMes);
+    if ($("r-mensual-desde")) $("r-mensual-desde").hidden = !c.desde;
+    if ($("r-primer-desde")) $("r-primer-desde").hidden = !c.desde;
     if ($("r-unavez-fila")) $("r-unavez-fila").hidden = !c.unaVez;
     if ($("r-unavez")) $("r-unavez").textContent = pesos(c.unaVez);
     if ($("r-pauta-nota")) $("r-pauta-nota").hidden = !estado.pauta;
     var vivo = $("r-vivo");
     if (vivo) {
-      var dicho = c.nombre + ". Total mensual: " + pesos(c.mensual) + "." + (c.unaVez ? " Una sola vez: " + pesos(c.unaVez) + "." : "");
+      var dicho = c.nombre + ". Total al mes: " + (c.desde ? "desde " : "") + pesos(c.mensual) + "." + (c.unaVez ? " Una sola vez: " + pesos(c.unaVez) + "." : "");
       if (vivo.textContent !== dicho) vivo.textContent = dicho;
     }
 
     // Barra del celular y enlaces de WhatsApp con el plan
-    if ($("pb-nombre")) $("pb-nombre").textContent = c.nombre + " · al mes";
+    if ($("pb-nombre")) $("pb-nombre").textContent = (c.conAdicionalesAlMes ? "Total al mes" : c.nombre + " · al mes") + (c.desde ? " · desde" : "");
     ponerPesos($("pb-total"), c.mensual);
     var enlace = enlaceWa(mensajePlan(estado, c));
     todos("[data-plan-wa]").forEach(function (a) { a.href = enlace; });
@@ -406,6 +410,14 @@ const CJ_PLAN = {
         if (entradas[0].isIntersecting) { evento("ViewContent", { content_name: "Arma tu plan" }); verCot.disconnect(); }
       }, { threshold: 0.12 });
       verCot.observe(cot);
+      // Mientras el cotizador está en pantalla, el botón de la barra superior no manda a donde ya estás: pasa a WhatsApp
+      var botonPlan = $("barra-plan"), botonWa = $("barra-wa");
+      if (botonPlan && botonWa) {
+        new IntersectionObserver(function (entradas) {
+          var dentro = entradas[0].isIntersecting;
+          botonPlan.hidden = dentro; botonWa.hidden = !dentro;
+        }, { rootMargin: "-45% 0px -45% 0px", threshold: 0 }).observe(cot);
+      }
     }
   }
 
