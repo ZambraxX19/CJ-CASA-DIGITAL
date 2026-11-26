@@ -592,3 +592,19 @@ input:focus-visible + .marca-c, input:focus-visible + .marca-r { outline: 3px so
   .js .cal:not(.on) .g .ic, .js .cal:not(.on) .p::after { opacity: 1; }
   .js .rev:not(.visto) .tel-avance { transform: none; }
 }
+
+/* Portafolios en PDF del cierre */
+.cierre-lado { margin-top: 48px; }
+.grupo { font-family: var(--titulos); font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--acido); margin-bottom: 12px; }
+.pdfs { border-top: 1.5px solid var(--linea); }
+.pdfs li { border-bottom: 1.5px solid var(--linea); }
+.pdfs a { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 64px; padding: 11px 0; text-decoration: none; }
+.pdfs a:hover b { text-decoration: underline; }
+.pdf-t { display: flex; flex-direction: column; gap: 1px; }
+.pdf-t b { font-size: 1.0313rem; line-height: 1.25; }
+.pdf-t span { font-size: .875rem; line-height: 1.35; }
+.pdfs small { font-size: .6875rem; font-weight: 700; letter-spacing: .08em; background: rgba(1,18,11,.28); padding: 3px 7px; border-radius: 6px; }
+@media (min-width: 1000px) {
+  .cierre-red { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 80px; align-items: end; }
+  .cierre-lado { margin-top: 0; }
+}

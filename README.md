@@ -10,8 +10,8 @@ rama `main`.
 - `assets/js/app.js`: el cotizador "Arma tu plan", el mensaje de WhatsApp y la medición.
 - `assets/fonts/` y `assets/img/`: las tipografías y el logo oficial.
 
-Los portafolios en PDF ya no están en el repo ni se enlazan desde la página: traían la oferta anterior. Se vuelven a
-agregar cuando estén actualizados.
+`portafolios/` tiene los cinco portafolios en PDF que se enlazan en el cierre de la página. Traen los precios dentro: si cambia
+un precio, hay que volver a sacarlos y reemplazarlos aquí.
 
 ## Cómo se arma el precio
 
