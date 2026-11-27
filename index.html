@@ -91,16 +91,26 @@
         <a class="btn btn-linea" data-wa href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Vi%20la%20p%C3%A1gina%20y%20quiero%20mi%20diagn%C3%B3stico%20de%2015%20minutos." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> Escríbenos por WhatsApp</a>
       </div>
     </div>
-    <figure class="cal" id="cal">
-      <div class="cal-dias" aria-hidden="true"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
-      <div class="cal-red" role="img" aria-label="Calendario del mes: un día de grabación y diez días de publicación">
-        <i class="g" style="--n:0"><svg class="ic" aria-hidden="true"><use href="#i-camara"/></svg></i><i></i><i></i><i></i><i class="p" style="--n:1"></i><i></i><i></i>
-        <i class="p" style="--n:2"></i><i></i><i class="p" style="--n:3"></i><i></i><i class="p" style="--n:4"></i><i></i><i></i>
-        <i class="p" style="--n:5"></i><i></i><i class="p" style="--n:6"></i><i></i><i class="p" style="--n:7"></i><i></i><i></i>
-        <i class="p" style="--n:8"></i><i></i><i class="p" style="--n:9"></i><i></i><i class="p" style="--n:10"></i><i></i><i></i>
+    <!-- Calendario del inicio. Sin JavaScript es la imagen de un mes tipo; con JavaScript cada día es un botón
+         (app.js, "Calendario del inicio"): se marcan los días de publicación y "Armar este plan" lleva esa cantidad al cotizador. -->
+    <div class="cal" id="cal">
+      <p class="cal-pista" id="cal-pista" hidden><svg class="ic" aria-hidden="true"><use href="#i-mas"/></svg>Toca los días en que quieres publicar.</p>
+      <figure>
+        <div class="cal-dias" aria-hidden="true"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+        <div class="cal-red" role="img" aria-label="Calendario del mes: un día de grabación y ocho días de publicación">
+          <i class="g" style="--n:0"><svg class="ic" aria-hidden="true"><use href="#i-camara"/></svg></i><i></i><i class="p" style="--n:1"></i><i></i><i class="p" style="--n:2"></i><i></i><i></i>
+          <i></i><i></i><i class="p" style="--n:3"></i><i></i><i class="p" style="--n:4"></i><i></i><i></i>
+          <i></i><i></i><i class="p" style="--n:5"></i><i></i><i class="p" style="--n:6"></i><i></i><i></i>
+          <i></i><i></i><i class="p" style="--n:7"></i><i></i><i class="p" style="--n:8"></i><i></i><i></i>
+        </div>
+        <figcaption class="leyenda"><span><i class="l-g"></i>Grabación</span><span><i class="l-p"></i>Publicación</span><span class="tipo">Mes tipo</span></figcaption>
+      </figure>
+      <div class="cal-pie" id="cal-pie" hidden>
+        <p class="cal-cuenta" id="cal-cuenta" aria-live="polite" aria-atomic="true"><b><span id="cal-n">8 publicaciones</span> al mes.</b> <span>Solo contenidos: <b id="cal-precio">$1.600.000</b>.</span></p>
+        <button type="button" class="btn btn-linea btn-ch" id="cal-armar">Armar este plan <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></button>
+        <p class="cal-aviso" id="cal-aviso" role="status" aria-live="polite"></p>
       </div>
-      <figcaption class="leyenda"><span><i class="l-g"></i>Grabación</span><span><i class="l-p"></i>Publicación</span><span class="tipo">Mes tipo</span></figcaption>
-    </figure>
+    </div>
   </div>
 </section>
 

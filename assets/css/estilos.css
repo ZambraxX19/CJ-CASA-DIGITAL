@@ -125,9 +125,9 @@ h1, h2, h3 { font-weight: 700; }
 .acciones { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
 
 .cal { margin-top: 40px; }
-.cal-dias { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 8px; text-align: center; font-size: .75rem; font-weight: 700; }
-.cal-red { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-.cal-red i { height: 42px; border-radius: 9px; background: var(--vacio); display: flex; align-items: center; justify-content: center; }
+.cal-dias { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 8px; text-align: center; font-size: .75rem; font-weight: 700; }
+.cal-red { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-red i, .cal-red button { height: 46px; border-radius: 9px; background: var(--vacio); display: flex; align-items: center; justify-content: center; }
 .cal-red .g { background: var(--acido); color: var(--verde); }
 .cal-red .g .ic { width: 22px; height: 22px; stroke-width: 2; }
 .cal-red .p { background: var(--morado); }
@@ -137,6 +137,30 @@ h1, h2, h3 { font-weight: 700; }
 .cal-red .g .ic, .cal-red .p::after { transition: opacity .3s ease; transition-delay: calc(var(--n) * 120ms + 320ms); }
 .js .cal:not(.on) .g, .js .cal:not(.on) .p { background: var(--vacio); transform: scale(.86); }
 .js .cal:not(.on) .g .ic, .js .cal:not(.on) .p::after { opacity: 0; }
+
+/* Con JavaScript cada día es un botón: se toca para marcar o quitar un día de publicación */
+.cal-pista { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: .9375rem; font-weight: 600; line-height: 1.3; }
+.cal-pista .ic { width: 20px; height: 20px; padding: 2px; border-radius: 50%; background: var(--acido); color: var(--verde); stroke-width: 2.6; }
+.cal-pista[hidden], .cal-pie[hidden] { display: none; }
+.cal-red button { border: 0; padding: 0; color: inherit; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+@media (hover: hover) {   /* solo con mouse: en pantallas táctiles el "hover" se queda pegado después de tocar */
+  .cal-red button:hover { background: rgba(255,255,255,.22); }
+  .cal-red button.p:hover { background: var(--morado2); }
+  .cal-red button.g:hover { background: var(--acido); box-shadow: 0 0 0 3px rgba(191,254,77,.3); }
+}
+.cal-red button:active { transform: scale(.9); }
+.cal-red button:focus-visible { outline: 3px solid var(--acido); outline-offset: 2px; }
+.cal-red button.g:focus-visible { outline-color: #fff; }
+.cal.despierta .cal-red button, .cal.despierta .cal-red button::after, .cal.despierta .cal-red button .ic { transition-duration: .14s; transition-delay: 0s; }
+.cal-pie { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px 12px; margin-top: 14px; }
+.cal-cuenta { display: flex; flex-direction: column; font-size: .9375rem; line-height: 1.3; }
+.cal-cuenta > span { font-size: .875rem; color: var(--fg2); }
+.cal-cuenta #cal-precio { color: var(--acido); }
+.cal-aviso { grid-column: 1 / -1; min-height: 1.4em; font-size: .8125rem; font-weight: 600; line-height: 1.4; color: var(--acido); }
+.cal-pie .btn { white-space: nowrap; padding: 0 16px; gap: 8px; }
+.cal-pie .btn .ic { width: 20px; height: 20px; }
+.cal.tocado .cal-pie .btn { background: var(--acido); color: var(--verde); box-shadow: none; }
+@media (max-width: 374px) { .cal-dias, .cal-red { gap: 2px; } }
 
 .leyenda { display: flex; align-items: center; gap: 18px; margin-top: 12px; font-size: .8125rem; font-weight: 600; letter-spacing: .03em; }
 .leyenda span { display: inline-flex; align-items: center; gap: 7px; }
@@ -446,7 +470,8 @@ input:focus-visible + .marca-c, input:focus-visible + .marca-r { outline: 3px so
   .sec { padding: 96px 0; }
   .caja { width: min(100% - 64px, 1180px); }
   .acciones { flex-direction: row; flex-wrap: wrap; }
-  .cal-red i { height: 52px; }
+  .cal-dias, .cal-red { gap: 6px; }
+  .cal-red i, .cal-red button { height: 52px; }
   .rachas-fila { grid-template-columns: 1fr 230px; align-items: end; gap: 32px; }
   .bloque { padding: 28px 26px; }
   .completo { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 18px; padding: 18px 18px; }
@@ -484,7 +509,12 @@ input:focus-visible + .marca-c, input:focus-visible + .marca-r { outline: 3px so
   .cal { margin-top: 0; }
   .cal-dias { gap: 9px; font-size: .8125rem; }
   .cal-red { gap: 9px; }
-  .cal-red i { height: 72px; border-radius: 13px; }
+  .cal-red i, .cal-red button { height: 72px; border-radius: 13px; }
+  .cal-pista { font-size: 1rem; margin-bottom: 14px; }
+  .cal-pie { margin-top: 18px; }
+  .cal-cuenta { font-size: 1.0625rem; }
+  .cal-cuenta > span { font-size: 1rem; }
+  .cal-aviso { font-size: .875rem; }
   .cal-red .g .ic { width: 30px; height: 30px; }
   .cal-red .p::after { width: 10px; height: 10px; }
   .desde strong { font-size: 2.75rem; }

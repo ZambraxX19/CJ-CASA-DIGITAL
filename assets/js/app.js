@@ -437,6 +437,74 @@ const CJ_PLAN = {
     });
   }
 
+  /* ---------- Calendario del inicio: cada día es un botón ----------
+     La persona marca los días en que quiere publicar (de `minimo` a `maximo`) y ve cuánto vale ese mes en solo
+     contenidos. "Armar este plan" lleva esa cantidad al cotizador. Sin JavaScript queda la imagen del mes. */
+  var DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"];
+  /* Reparte una cantidad de contenidos: con 8, 12 o 15 usa la mezcla de ejemplo; con las intermedias,
+     la mezcla de ejemplo anterior y el resto en videos (lo mismo que tocar "+" en Videos). */
+  function ponerCantidad(n) {
+    var base = null, cuanto = 0;
+    Object.keys(P.atajos).forEach(function (k) {
+      var a = P.atajos[k], t = a.videos + a.carruseles + a.estaticas;
+      if (t <= n && t > cuanto) { base = k; cuanto = t; }
+    });
+    if (!base) return;
+    ponerAtajo(base);
+    estado.videos += n - cuanto;
+  }
+  function calendario() {
+    var cal = $("cal"), red = cal ? cal.querySelector(".cal-red") : null;
+    if (!red) return;
+    var celdas = todos("i", red);
+    if (!celdas.length) return;
+    red.innerHTML = celdas.map(function (c, k) {
+      var donde = DIAS[k % 7] + " de la semana " + (Math.floor(k / 7) + 1);
+      var orden = c.style.getPropertyValue("--n"), estilo = orden ? ' style="--n:' + orden + '"' : "";
+      if (c.classList.contains("g")) return '<button type="button" class="g" data-grabacion' + estilo + ' aria-label="Día de grabación: ' + donde + '">' + c.innerHTML + "</button>";
+      var marcado = c.classList.contains("p");
+      return '<button type="button"' + (marcado ? ' class="p"' : "") + estilo + ' aria-pressed="' + marcado + '" aria-label="Publicación el ' + donde + '"></button>';
+    }).join("");
+    red.setAttribute("role", "group");
+    red.setAttribute("aria-label", "Días de publicación del mes");
+    if ($("cal-pista")) $("cal-pista").hidden = false;
+    if ($("cal-pie")) $("cal-pie").hidden = false;
+    cal.classList.add("viva");
+
+    function cuantas() { return red.querySelectorAll("button.p").length; }
+    function contar() {
+      var n = cuantas();
+      texto("cal-n", cuantos(n, "publicación", "publicaciones"));
+      texto("cal-precio", pesos(precioSolo(n)));
+    }
+    function avisar(dicho) {
+      var aviso = $("cal-aviso"); if (!aviso) return;
+      aviso.textContent = "";            // para que se vuelva a anunciar aunque sea el mismo aviso
+      aviso.textContent = dicho;
+    }
+    red.addEventListener("click", function (ev) {
+      var b = ev.target.closest ? ev.target.closest("button") : null;
+      if (!b || !red.contains(b)) return;
+      cal.classList.add("despierta");        // desde el primer toque, la respuesta es inmediata
+      if (b.hasAttribute("data-grabacion")) { avisar("Este es tu único día de grabación."); return; }
+      var n = cuantas(), marcado = b.classList.contains("p");
+      if (marcado && n <= P.minimo) { avisar(P.minimo + " es el mínimo. Para mover un día, marca primero otro."); return; }
+      if (!marcado && n >= P.maximo) { avisar(P.maximo + " es el máximo. Para sumar un día, quita primero otro."); return; }
+      b.classList.toggle("p", !marcado);
+      b.setAttribute("aria-pressed", String(!marcado));
+      cal.classList.add("tocado");
+      avisar("");
+      contar();
+    });
+    if ($("cal-armar")) $("cal-armar").addEventListener("click", function () {
+      ponerCantidad(cuantas()); cambio();
+      var destino = $("cotizador"), titulo = $("cot-tit");
+      if (destino) destino.scrollIntoView({ behavior: sinMovimiento ? "auto" : "smooth", block: "start" });
+      if (titulo) titulo.focus({ preventScroll: true });
+    });
+    contar();
+  }
+
   /* ---------- Preguntas ---------- */
   function preguntas() {
     todos(".faq-b").forEach(function (b) {
@@ -468,8 +536,8 @@ const CJ_PLAN = {
       else {
         var verCal = new IntersectionObserver(function (entradas) {
           if (entradas[0].isIntersecting) { cal.classList.add("on"); verCal.disconnect(); }
-        }, { threshold: 0.35 });
-        verCal.observe(cal);
+        }, { threshold: 0.25 });
+        verCal.observe(cal.querySelector(".cal-red") || cal);
       }
     }
     if (barra && inicio) {
@@ -498,7 +566,7 @@ const CJ_PLAN = {
   }
 
   function arrancar() {
-    try { rotulos(); pintar(); eventos(); preguntas(); }
+    try { rotulos(); pintar(); eventos(); preguntas(); calendario(); }
     finally { movimiento(); }
   }
   if (d.readyState === "loading") d.addEventListener("DOMContentLoaded", arrancar); else arrancar();
