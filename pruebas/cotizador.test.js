@@ -3,7 +3,7 @@
 const { playwright, iniciar } = require("./apoyo");
 const { chromium } = playwright();
 const PUERTO = 4174, BASE = "http://127.0.0.1:" + PUERTO + "/";
-const WA = "https://wa.me/573052007745?text=";
+const WA = "https://wa.me/573009867822?text=";
 const resultados = [];
 function ok(nombre, condicion, detalle) { resultados.push({ nombre, pasa: !!condicion, detalle: detalle || "" }); }
 function igual(nombre, obtenido, esperado) { ok(nombre, obtenido === esperado, "obtenido: " + JSON.stringify(obtenido) + (obtenido === esperado ? "" : " · esperado: " + JSON.stringify(esperado))); }
@@ -240,7 +240,7 @@ const conIA = async (page, n) => { for (let i = 0; i < n; i++) { await centrar(p
   // ---------- Mensaje de WhatsApp ----------
   page = await abrir(ctx); await atajo(page, "p12"); await completo(page); r = await leer(page);
   igual("WhatsApp 1 · plan completo", r.mensaje, "Hola, CJ. Armé este plan en la página: Plan 12 completo (8 videos, 2 carruseles y 2 estáticas). Incluye estrategia del mes, manejo de Instagram y pauta básica. Mensual: $3.500.000. Quiero mi diagnóstico de 15 minutos.");
-  ok("WhatsApp 1 · el enlace va al 573052007745", r.href.startsWith(WA), r.href.slice(0, 40));
+  ok("WhatsApp 1 · el enlace va al 573009867822", r.href.startsWith(WA), r.href.slice(0, 40));
   igual("WhatsApp 1 · la barra del celular manda el mismo plan", r.hrefBarra, r.href);
   igual("La barra del celular muestra el mismo total", r.barra, r.mensual);
   igual("La barra nombra el plan completo", r.rotuloBarra, "Plan 12 completo");
@@ -269,7 +269,7 @@ const conIA = async (page, n) => { for (let i = 0; i < n; i++) { await centrar(p
 
   // ---------- Página: enlaces, tarjetas, restos de la oferta anterior ----------
   const enlaces = await page.locator('a[href*="wa.me"], a[href*="whatsapp"]').evaluateAll((as) => as.map((a) => a.getAttribute("href")));
-  ok("Todos los enlaces a WhatsApp usan el 573052007745 (" + enlaces.length + " enlaces)", enlaces.length >= 5 && enlaces.every((h) => h.startsWith("https://wa.me/573052007745?text=")));
+  ok("Todos los enlaces a WhatsApp usan el 573009867822 (" + enlaces.length + " enlaces)", enlaces.length >= 5 && enlaces.every((h) => h.startsWith("https://wa.me/573009867822?text=")));
   igual("No hay formularios ni campos de texto", await page.locator('form, input[type="text"], input[type="email"], input[type="tel"], textarea, select').count(), 0);
   igual("Partes de Planes y precios, en orden", (await page.locator("main > section, main > nav").evaluateAll((x) => x.map((e) => e.id))).join(" "), "cabecera pestanas planes arma-tu-plan incluye start-content preguntas cierre");
   igual("Tarjetas: solo contenidos", (await page.locator("[data-plan-solo]").allTextContents()).join(" "), "$1.600.000 $2.400.000 $3.000.000");
@@ -277,7 +277,7 @@ const conIA = async (page, n) => { for (let i = 0; i < n; i++) { await centrar(p
   igual("Start Content: precio desde CJ_PLAN y su mensaje", (await page.locator(".sc-precio").innerText()).replace(/\s+/g, " ").trim() + " · " + decodeURIComponent((await page.locator("#start-content a[data-wa]").getAttribute("href")).split("text=")[1]), "$1.200.000, pago único · Hola, CJ. Quiero empezar con Start Content.");
   igual("\"¿Algo más para tu negocio?\" enlaza a Otros servicios", await page.locator('.bloque a[href="/otros-servicios/"]').innerText().then((t) => t.trim()), "Ver otros servicios");
   const html = await page.evaluate(() => document.documentElement.outerHTML);
-  const restos = [/growth/i, /luces b[áa]sicas/i, /desde \$1\.000\.000/i, /clon/i, /avatar/i, /asistente de whatsapp/i, /diagn[óo]stico de procesos/i, /responder por whatsapp/i, /\$1\.500\.000/, /estrategia completa/i, /luces PRO para/i, /300\s?986\s?7822/, /\$600\.000 al mes/, /gesti[óo]n de pauta/i, /estrategia b[áa]sica/i].filter((re) => re.test(html)).map(String);
+  const restos = [/growth/i, /luces b[áa]sicas/i, /desde \$1\.000\.000/i, /clon/i, /avatar/i, /asistente de whatsapp/i, /diagn[óo]stico de procesos/i, /responder por whatsapp/i, /\$1\.500\.000/, /estrategia completa/i, /luces PRO para/i, /305\s?200\s?7745/, /\$600\.000 al mes/, /gesti[óo]n de pauta/i, /estrategia b[áa]sica/i].filter((re) => re.test(html)).map(String);
   igual("Sin restos de la oferta anterior en el HTML", restos.join(" "), "");
   igual("Preguntas, en orden", (await page.locator(".faq-b").allInnerTexts()).map((t) => t.trim()).join(" | "), "¿Tengo que salir yo en los videos? | ¿Qué es el plan completo? | ¿Cuánto tiempo me quita al mes? | ¿Ustedes publican y responden los mensajes? | ¿Necesito pagar pauta? | ¿Qué pasa si quiero más contenido? | ¿Qué garantizan? | ¿Cómo empezamos?");
 

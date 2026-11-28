@@ -4,7 +4,7 @@ const fs = require("fs"), path = require("path");
 const { playwright, iniciar, RAIZ, PAGINAS, TODAS } = require("./apoyo");
 const { chromium } = playwright();
 const PUERTO = 4181, BASE = "http://127.0.0.1:" + PUERTO;
-const WA = "https://wa.me/573052007745?text=";
+const WA = "https://wa.me/573009867822?text=";
 const ARCHIVO = { "/": "index.html", "/planes/": "planes/index.html", "/como-funciona/": "como-funciona/index.html", "/otros-servicios/": "otros-servicios/index.html", "/portafolios/": "portafolios/index.html", "/404.html": "404.html" };
 const resultados = [];
 function ok(nombre, condicion, detalle) { resultados.push({ nombre, pasa: !!condicion, detalle: detalle == null ? "" : String(detalle) }); }
@@ -96,7 +96,7 @@ function vigilar(page) {
     let internos = 0; const rotos = [], otros = new Set();
     for (const par of enlaces) {
       const [origen, href] = par.split(" → ");
-      if (/^(https:\/\/wa\.me\/573052007745\?text=|mailto:cjcasadigital@gmail\.com$|https:\/\/www\.cjcasadigital\.com\/$)/.test(href)) continue;
+      if (/^(https:\/\/wa\.me\/573009867822\?text=|mailto:cjcasadigital@gmail\.com$|https:\/\/www\.cjcasadigital\.com\/$)/.test(href)) continue;
       if (!href.startsWith("/") && !href.startsWith("#")) { otros.add(href); continue; }
       internos++;
       const url = new URL(href, BASE + origen), sinAncla = url.pathname;
@@ -223,7 +223,7 @@ function vigilar(page) {
       if (ruta === "/") igual("WhatsApp flotante: su mensaje y su nombre accesible", mensaje(await page.locator("#wa-flota").getAttribute("href")) + " · " + (await page.locator("#wa-flota").getAttribute("aria-label")), "Hola, CJ. Vi la página y quiero mi diagnóstico de 15 minutos. · Escríbenos por WhatsApp");
       await page.close();
     }
-    igual("Un solo número de WhatsApp en todo el sitio", [...numeros].join(" "), "573052007745");
+    igual("Un solo número de WhatsApp en todo el sitio", [...numeros].join(" "), "573009867822");
     await ctx.close();
     const esc = await nuevo(1280, 900); const p2 = await esc.newPage(); await p2.goto(BASE + "/", { waitUntil: "networkidle" }); await p2.evaluate(() => window.scrollTo(0, 1200)); await p2.waitForTimeout(400);
     ok("En escritorio no hay botón flotante", !(await p2.locator("#wa-flota").isVisible()));

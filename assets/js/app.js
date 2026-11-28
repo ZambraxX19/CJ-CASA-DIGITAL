@@ -15,7 +15,7 @@ const CJ_CONFIG = { pixelId: "" };
    Lo de "¿Algo más para tu negocio?" (página web, automatización, capacitación, portafolio) no tiene precio aquí:
    se cotiza en el diagnóstico y solo viaja en el mensaje de WhatsApp. */
 const CJ_PLAN = {
-  whatsapp: "573052007745",
+  whatsapp: "573009867822",
   porContenido: 200000,     // cada video, carrusel o estática, al mes
   minimo: 8,
   maximo: 15,
