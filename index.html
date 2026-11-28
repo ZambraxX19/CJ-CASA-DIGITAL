@@ -17,17 +17,31 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/png" sizes="64x64" href="assets/img/favicon.png">
-<link rel="apple-touch-icon" href="assets/img/icono-192.png">
-<link rel="preload" href="assets/fonts/gobold-700.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/dm-sans-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/estilos.css">
+<link rel="icon" type="image/png" sizes="64x64" href="/assets/img/favicon.png">
+<link rel="apple-touch-icon" href="/assets/img/icono-192.png">
+<link rel="preload" href="/assets/fonts/gobold-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/dm-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/estilos.css">
 <script>document.documentElement.className = "js";</script>
-<script src="assets/js/app.js" defer></script>
+<script>
+/* Direcciones de cuando el sitio era una sola página (/#cotizador, /#planes…): cada una lleva a su página nueva.
+   Va aquí, antes de pintar, para que no se alcance a ver el inicio. Sin JavaScript, el inicio conserva esos id. */
+(function () {
+  var nuevas = {
+    cotizador: "/planes/#arma-tu-plan", planes: "/planes/#planes", contenido: "/planes/#contenido",
+    incluye: "/planes/#incluye", preguntas: "/planes/#preguntas", ia: "/otros-servicios/",
+    como: "/como-funciona/#proceso", treinta: "/como-funciona/#proceso", problema: "/como-funciona/", giro: "/como-funciona/"
+  };
+  var destino = nuevas[location.hash.slice(1)];
+  if (destino) location.replace(destino.replace("#", location.search + "#").replace(/\/$/, "/" + location.search));
+})();
+</script>
+<script src="/assets/js/app.js" defer></script>
 </head>
-<body>
+<body class="pag-inicio">
 
-<!-- Íconos lineales de la página -->
+<!-- ===== BLOQUE COMPARTIDO · CABECERA · Igual en todas las páginas. La fuente es index.html: se copia de ahí
+     y solo cambia aria-current="page", que va en el enlace de la página actual. ===== -->
 <svg class="oculto" aria-hidden="true" focusable="false">
 <symbol id="i-camara" viewBox="0 0 24 24"><rect x="3" y="6.5" width="13" height="11" rx="2.5"/><path d="M16 11l5-3v8l-5-3z"/></symbol>
 <symbol id="i-video" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3.5"/><path d="M10 9.3v5.4l4.6-2.7z"/></symbol>
@@ -49,6 +63,9 @@
 <symbol id="i-web" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.500"/><path d="M3 9.500h18M6.200 7.300h.1M8.800 7.300h.1"/></symbol>
   <symbol id="i-portada" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.500"/><path d="M8.500 8h7M8.500 11.500h4.500"/></symbol>
 <symbol id="i-flujo" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.300"/><circle cx="18" cy="12" r="2.300"/><circle cx="6" cy="18" r="2.300"/><path d="M8.300 6H12a3.500 3.500 0 013.500 3.500v.3M8.300 18H12a3.500 3.500 0 003.500-3.500v-.3"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+<symbol id="i-calendario" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/></symbol>
+<symbol id="i-claqueta" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M4 10l1.2-4.4 14.6-2.2.4 3.6zM9 5l1.6 3.4M13.6 4.3l1.6 3.4"/></symbol>
 <symbol id="i-mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
 <symbol id="i-menos" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
 <symbol id="i-flecha" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
@@ -57,27 +74,37 @@
 <symbol id="i-historia" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="3"/><circle cx="12" cy="12" r="2.4"/></symbol>
 </svg>
 
-<a class="salto" href="#cotizador">Ir a Arma tu plan</a>
+<a class="salto" href="#principal">Saltar al contenido</a>
 
-<!-- 1 · Barra superior -->
-<header class="barra">
+<header class="barra" id="barra">
   <div class="barra-in">
-    <a class="marca" href="#inicio" aria-label="CJ Casa Digital, inicio"><img src="assets/img/logo-cj-blanco.png" width="400" height="150" alt="CJ Casa Digital"></a>
-    <nav class="barra-nav" aria-label="Secciones">
-      <a href="#ia">IA para tu negocio</a>
-      <a href="#como">Cómo funciona</a>
-      <a href="#planes">Planes</a>
-      <a href="#cotizador">Arma tu plan</a>
-      <a href="#preguntas">Preguntas</a>
+    <a class="marca" href="/" aria-label="CJ Casa Digital, inicio"><img src="/assets/img/logo-cj-blanco.png" width="400" height="150" alt="CJ Casa Digital"></a>
+    <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú"><svg class="ic ic-abrir" aria-hidden="true"><use href="#i-menu"/></svg><svg class="ic ic-cerrar" aria-hidden="true"><use href="#i-equis"/></svg></button>
+    <noscript><a class="menu-btn" href="#mapa" aria-label="Ir al menú, al final de la página"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg></a></noscript>
+    <nav class="menu" id="menu" aria-label="Principal">
+      <ul class="menu-lista">
+        <li class="solo-cel"><a href="/" aria-current="page"><b>Inicio</b><span>Qué hacemos y por dónde empezar</span></a></li>
+        <li><a href="/planes/"><b>Planes y precios</b><span>Planes desde <i data-p="desde">$1.600.000</i> al mes</span></a></li>
+        <li class="solo-cel"><a href="/planes/#arma-tu-plan"><b>Arma tu plan</b><span>Escoge y mira el precio</span></a></li>
+        <li><a href="/como-funciona/"><b>Cómo funciona</b><span>Un día de grabación al mes</span></a></li>
+        <li><a href="/otros-servicios/"><b>Otros servicios</b><span>Página web, automatización, IA y Speak</span></a></li>
+        <li><a href="/portafolios/"><b>Portafolios</b><span>Los cinco PDF para leer o reenviar</span></a></li>
+        <li class="solo-cel"><a href="/planes/#preguntas"><b>Preguntas</b><span>Tiempo, pauta, garantía y cómo empezar</span></a></li>
+      </ul>
+      <div class="menu-fin">
+        <a class="btn btn-acido" href="/planes/#arma-tu-plan">Arma tu plan <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></a>
+        <a class="btn btn-linea" data-wa href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Vi%20la%20p%C3%A1gina%20y%20quiero%20mi%20diagn%C3%B3stico%20de%2015%20minutos." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> Escríbenos por WhatsApp</a>
+      </div>
     </nav>
-    <a class="btn btn-acido btn-ch" id="barra-plan" href="#cotizador">Arma tu plan</a>
+    <a class="btn btn-acido btn-ch" id="barra-plan" href="/planes/#arma-tu-plan">Arma tu plan</a>
     <a class="btn btn-acido btn-ch" id="barra-wa" data-wa data-plan-wa hidden href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Vi%20la%20p%C3%A1gina%20y%20quiero%20mi%20diagn%C3%B3stico%20de%2015%20minutos." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> WhatsApp</a>
   </div>
 </header>
+<!-- ===== FIN DEL BLOQUE COMPARTIDO · CABECERA ===== -->
 
-<main>
+<main id="principal">
 
-<!-- 2 · Inicio -->
+<!-- Inicio: titular con precio, calendario y los cinco atajos. En celular los atajos van antes del calendario (CSS: order). -->
 <section class="sec t-oscuro inicio" id="inicio">
   <div class="caja inicio-red">
     <div class="inicio-txt">
@@ -87,7 +114,7 @@
       <p class="desde">Planes desde <strong data-p="desde">$1.600.000</strong> al mes</p>
       <p class="desde-2">Plan completo desde <b data-p="desdeCompleto">$2.500.000</b></p>
       <div class="acciones">
-        <a class="btn btn-acido" href="#cotizador">Arma tu plan <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></a>
+        <a class="btn btn-acido" href="/planes/#arma-tu-plan">Arma tu plan <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></a>
         <a class="btn btn-linea" data-wa href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Vi%20la%20p%C3%A1gina%20y%20quiero%20mi%20diagn%C3%B3stico%20de%2015%20minutos." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> Escríbenos por WhatsApp</a>
       </div>
     </div>
@@ -107,541 +134,118 @@
       </figure>
       <div class="cal-pie" id="cal-pie" hidden>
         <p class="cal-cuenta" id="cal-cuenta" aria-live="polite" aria-atomic="true"><b><span id="cal-n">8 publicaciones</span> al mes.</b> <span>Solo contenidos: <b id="cal-precio">$1.600.000</b>.</span></p>
-        <button type="button" class="btn btn-linea btn-ch" id="cal-armar">Armar este plan <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></button>
+        <a class="btn btn-linea btn-ch" id="cal-armar" href="/planes/?contenidos=8#arma-tu-plan">Armar este plan <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></a>
         <p class="cal-aviso" id="cal-aviso" role="status" aria-live="polite"></p>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- 3 · IA para tu negocio: lo otro que hacemos, antes de los planes de contenido -->
-<section class="sec sec-m t-claro" id="ia">
-  <div class="caja">
-    <div class="ia-cab">
-      <p class="kicker rev"><span class="num">02</span><span class="raya"></span></p>
-      <h2 class="tit t-h3 rev">Antes de ver tu plan, esto también lo hacemos</h2>
-      <p class="cuerpo rev">Usamos IA para que tu negocio trabaje mejor, no solo para tus redes. Cada negocio es distinto, así que esto se cotiza en el diagnóstico.</p>
-    </div>
-    <ul class="servs">
-      <li class="serv rev">
-        <svg class="ic" aria-hidden="true"><use href="#i-web"/></svg>
-        <h3>Página web</h3>
-        <p>Una página hecha para vender, con tus precios o tu cotizador.</p>
-        <a class="btn btn-borde btn-ch" data-wa data-msg="Hola, CJ. Quiero una página web para mi negocio." href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Quiero%20una%20p%C3%A1gina%20web%20para%20mi%20negocio." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> Háblanos<span class="sr">: Página web</span></a>
-      </li>
-      <li class="serv rev">
-        <svg class="ic" aria-hidden="true"><use href="#i-flujo"/></svg>
-        <h3>Automatización de procesos</h3>
-        <p>Informes, cotizaciones, seguimiento o agendamiento que hoy haces a mano.</p>
-        <a class="btn btn-borde btn-ch" data-wa data-msg="Hola, CJ. Quiero automatizar un proceso de mi negocio." href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Quiero%20automatizar%20un%20proceso%20de%20mi%20negocio." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> Háblanos<span class="sr">: Automatización de procesos</span></a>
-      </li>
-      <li class="serv rev">
-        <svg class="ic" aria-hidden="true"><use href="#i-chispa"/></svg>
-        <h3>Capacitación en IA para tu equipo</h3>
-        <p>Tu equipo aprende a usar IA en su trabajo de todos los días.</p>
-        <a class="btn btn-borde btn-ch" data-wa data-msg="Hola, CJ. Quiero una capacitación en IA para mi equipo." href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Quiero%20una%20capacitaci%C3%B3n%20en%20IA%20para%20mi%20equipo." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> Háblanos<span class="sr">: Capacitación en IA para tu equipo</span></a>
-      </li>
-      <li class="serv rev">
-        <svg class="ic" aria-hidden="true"><use href="#i-pantalla"/></svg>
-        <h3>Portafolio y presentaciones</h3>
-        <p>Tu propuesta comercial lista para enviar, bien diseñada.</p>
-        <a class="btn btn-borde btn-ch" data-wa data-msg="Hola, CJ. Quiero un portafolio o una presentación para mi negocio." href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Quiero%20un%20portafolio%20o%20una%20presentaci%C3%B3n%20para%20mi%20negocio." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> Háblanos<span class="sr">: Portafolio y presentaciones</span></a>
-      </li>
-    </ul>
-    <div class="puente rev">
-      <p>Y ahora, a lo que viniste: tu contenido de todo el mes.</p>
-      <a class="btn btn-oscuro" href="#planes">Ver los planes de contenido <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></a>
-    </div>
-  </div>
-</section>
-
-<!-- 4 · El problema -->
-<section class="sec t-oscuro" id="problema">
-  <div class="caja dos-col">
-    <div>
-      <p class="kicker rev"><span class="num">03</span><span class="raya"></span></p>
-      <h2 class="tit t-h2 rev">¿Alguna de estas frases es tuya?</h2>
-      <p class="cita-g rev">“Yo sí sé lo que vendo, pero no sé cómo decirlo en redes.”</p>
-    </div>
-    <div>
-      <ul class="citas rev">
-        <li>“No tengo tiempo para estar grabando todos los días.”</li>
-        <li>“No me quiero ver payaso.”</li>
-        <li>“Yo contraté marketing y no entendieron mi marca.”</li>
+    <div class="buscas" id="buscas">
+      <h2 class="tit t-h4">¿Qué buscas?</h2>
+      <ul class="buscas-red">
+        <li><span class="ancla" id="cotizador"></span><span class="ancla" id="contenido"></span><span class="ancla" id="incluye"></span><span class="ancla" id="preguntas"></span><a class="busca" id="planes" href="/planes/">
+          <svg class="ic" aria-hidden="true"><use href="#i-calendario"/></svg>
+          <span class="busca-t"><b>Quiero contenido para mis redes cada mes</b><span>Plan 8, 12 o 15 · desde <span data-p="desde">$1.600.000</span> al mes</span></span>
+          <span class="busca-ir">Ver los planes <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></span>
+        </a></li>
+        <li><a class="busca" href="/planes/#start-content">
+          <svg class="ic" aria-hidden="true"><use href="#i-claqueta"/></svg>
+          <span class="busca-t"><b>Quiero empezar con algo pequeño</b><span>Start Content · 3 videos y 1 hecho con IA en 15 días · <span data-p="startContent">$1.200.000</span>, pago único</span></span>
+          <span class="busca-ir">Ver Start Content <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></span>
+        </a></li>
+        <li><a class="busca" href="/otros-servicios/#speak">
+          <svg class="ic" aria-hidden="true"><use href="#i-voz"/></svg>
+          <span class="busca-t"><b>Quiero perderle el miedo a la cámara</b><span>Speak · 4 u 8 clases virtuales · desde <span data-p="speakPro">$800.000</span></span></span>
+          <span class="busca-ir">Ver Speak <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></span>
+        </a></li>
+        <li><a class="busca" id="ia" href="/otros-servicios/">
+          <svg class="ic" aria-hidden="true"><use href="#i-chispa"/></svg>
+          <span class="busca-t"><b>Página web, automatización o IA para mi negocio</b><span>Se cotiza en el diagnóstico</span></span>
+          <span class="busca-ir">Ver otros servicios <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></span>
+        </a></li>
+        <li><a class="busca" href="/portafolios/">
+          <svg class="ic" aria-hidden="true"><use href="#i-portada"/></svg>
+          <span class="busca-t"><b>Quiero ver los portafolios en PDF</b><span>5 documentos para leer o reenviar</span></span>
+          <span class="busca-ir">Ver los portafolios <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></span>
+        </a></li>
       </ul>
-      <div class="rachas-fila rev">
-        <p class="cuerpo">Tu negocio ya vende. Pero publicas por rachas, la cámara te da pena y la última vez que pagaste por redes quedaste mal. Así cualquiera termina pensando que las redes no sirven.</p>
-        <figure class="rachas">
-          <div class="cal-dias" aria-hidden="true"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
-          <div class="rachas-red" role="img" aria-label="Un mes publicando por rachas: tres días seguidos, dos semanas después otros dos, y el resto vacío">
-            <i></i><i class="p"></i><i class="p"></i><i class="p"></i><i></i><i></i><i></i>
-            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-            <i></i><i></i><i></i><i></i><i class="p"></i><i class="p"></i><i></i>
-            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-          </div>
-          <figcaption class="leyenda"><span><i class="l-n"></i>Publicación</span></figcaption>
-        </figure>
-      </div>
     </div>
   </div>
 </section>
 
-<!-- 5 · El giro -->
-<section class="sec t-morado" id="giro">
-  <div class="caja giro-red">
-    <div>
-      <p class="kicker rev"><span class="num">04</span><span class="raya"></span></p>
-      <h2 class="tit t-h2 t-h2g rev">La gente le cree a una persona</h2>
-      <p class="cuerpo cuerpo-g rev">Antes de comprar, la gente quiere saber quién está detrás del negocio. Un logo no responde eso; tú sí. Por eso en tu contenido sales tú. Lo nuestro es que salir no te quite tiempo ni te haga quedar mal.</p>
-    </div>
-    <div class="giro-graf rev">
-      <div class="giro-tel" aria-hidden="true">
-        <svg class="tel tel-logo" viewBox="0 0 128 254"><rect width="128" height="254" rx="22" fill="#01120B"/><circle cx="54" cy="118" r="22" fill="none" stroke="#fff" stroke-width="2.6" opacity=".55"/><rect x="60" y="104" width="34" height="34" rx="6" fill="none" stroke="#fff" stroke-width="2.6" opacity=".55"/><rect x="50" y="13" width="28" height="6.5" rx="3.2" fill="rgba(255,255,255,.14)"/></svg>
-        <svg class="tel tel-persona" viewBox="0 0 128 254"><defs><clipPath id="pant-a"><rect x="7" y="7" width="114" height="240" rx="16"/></clipPath></defs><rect width="128" height="254" rx="22" fill="#01120B"/><g clip-path="url(#pant-a)"><rect x="7" y="7" width="114" height="240" fill="#9133E7"/><circle cx="64" cy="106" r="24" fill="#E6EFF8"/><path d="M20 250c0-62 16-98 44-98s44 36 44 98z" fill="#E6EFF8"/></g><rect x="50" y="13" width="28" height="6.5" rx="3.2" fill="#01120B"/></svg>
-      </div>
-      <p class="dest dest-g">Te guiamos y no te dejamos ver mal.</p>
-    </div>
-  </div>
-</section>
-
-<!-- 6 · Cómo funciona -->
-<section class="sec t-oscuro" id="como">
-  <div class="caja dos-col">
-    <div class="pegado">
-      <p class="kicker rev"><span class="num">05</span><span class="raya"></span></p>
-      <h2 class="tit t-h2 rev">Así se hace tu contenido cada mes</h2>
-      <p class="dest dest-ac rev">Un solo día de grabación al mes.</p>
-      <p class="cuerpo rev">El día de grabación ponemos los micrófonos, los trípodes, las luces PRO y la dirección. Tú pones la cara.</p>
-    </div>
-    <ol class="pasos">
-      <li class="rev"><span class="n">1</span><span><b>Estrategia:</b> el mensaje y los temas del mes</span><svg class="ic" aria-hidden="true"><use href="#i-estrategia"/></svg></li>
-      <li class="rev"><span class="n">2</span><span><b>Guiones:</b> cada video y cada texto, escritos</span><svg class="ic" aria-hidden="true"><use href="#i-guion"/></svg></li>
-      <li class="rev"><span class="n">3</span><span><b>Preparación:</b> dos sesiones antes de grabar</span><svg class="ic" aria-hidden="true"><use href="#i-voz"/></svg></li>
-      <li class="rev res"><span class="n">4</span><span><b>Grabación:</b> un solo día, con dirección</span><svg class="ic" aria-hidden="true"><use href="#i-camara"/></svg></li>
-      <li class="rev"><span class="n">5</span><span>Edición y diseño de cada pieza</span><svg class="ic" aria-hidden="true"><use href="#i-edicion"/></svg></li>
-      <li class="rev"><span class="n">6</span><span>Entrega con una ronda de ajustes</span><svg class="ic" aria-hidden="true"><use href="#i-ajustes"/></svg></li>
+<!-- Cómo funciona, en tres pasos. Los id vacíos son las anclas de cuando el sitio era una sola página (sin JavaScript llevan aquí). -->
+<section class="sec sec-m t-claro" id="como">
+  <span class="ancla" id="problema"></span><span class="ancla" id="giro"></span><span class="ancla" id="treinta"></span>
+  <div class="caja">
+    <h2 class="tit t-h3 rev">Así funciona, en tres pasos</h2>
+    <ol class="tres">
+      <li class="rev"><span class="n" aria-hidden="true">1</span><h3>Estrategia y guiones</h3><p>El mensaje del mes y cada pieza, escritos antes de grabar.</p></li>
+      <li class="rev"><span class="n" aria-hidden="true">2</span><h3>Un día de grabación</h3><p>Ponemos los micrófonos, los trípodes, las luces PRO y la dirección. Tú pones la cara.</p></li>
+      <li class="rev"><span class="n" aria-hidden="true">3</span><h3>Piezas listas</h3><p>Editadas o diseñadas, con su portada y su descripción.</p></li>
     </ol>
+    <a class="btn btn-oscuro rev" href="/como-funciona/">Ver cómo funciona <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></a>
   </div>
 </section>
 
-<!-- 7 · Qué es un contenido -->
-<section class="sec t-claro" id="contenido">
-  <div class="caja dos-col areas">
-    <div class="a-cab">
-      <p class="kicker rev"><span class="num">06</span><span class="raya"></span></p>
-      <h2 class="tit t-h2 rev">Un contenido es una pieza lista para publicar</h2>
-    </div>
-    <div class="telefonos a-graf rev">
-      <figure>
-        <svg class="tel" viewBox="0 0 128 254" aria-hidden="true"><defs><clipPath id="pant-v"><rect x="7" y="7" width="114" height="240" rx="16"/></clipPath></defs><rect width="128" height="254" rx="22" fill="#01120B"/><g clip-path="url(#pant-v)"><rect x="7" y="7" width="114" height="240" fill="#9133E7"/><circle cx="64" cy="118" r="25" fill="none" stroke="#fff" stroke-width="2.6"/><path d="M57 105.5v25L78 118z" fill="#fff"/><rect x="20" y="218" width="88" height="4.5" rx="2.2" fill="rgba(255,255,255,.4)"/><rect class="tel-avance" x="20" y="218" width="36" height="4.5" rx="2.2" fill="#BFFE4D"/></g><rect x="50" y="13" width="28" height="6.5" rx="3.2" fill="#01120B"/></svg>
-        <figcaption>Un video</figcaption>
-      </figure>
-      <figure>
-        <svg class="tel" viewBox="0 0 128 254" aria-hidden="true"><defs><clipPath id="pant-c"><rect x="7" y="7" width="114" height="240" rx="16"/></clipPath></defs><rect width="128" height="254" rx="22" fill="#01120B"/><g clip-path="url(#pant-c)"><rect x="7" y="7" width="114" height="240" fill="#E6EFF8"/><rect x="19" y="50" width="78" height="118" rx="11" fill="#9133E7"/><rect x="104" y="50" width="78" height="118" rx="11" fill="#A75CEB"/><rect x="30" y="66" width="46" height="6" rx="3" fill="#fff"/><rect x="30" y="79" width="30" height="6" rx="3" fill="#fff"/><circle cx="50" cy="194" r="4" fill="#01120B"/><circle cx="64" cy="194" r="4" fill="rgba(1,18,11,.25)"/><circle cx="78" cy="194" r="4" fill="rgba(1,18,11,.25)"/></g><rect x="50" y="13" width="28" height="6.5" rx="3.2" fill="#01120B"/></svg>
-        <figcaption><b>Un carrusel:</b> varias imágenes que se deslizan</figcaption>
-      </figure>
-      <figure>
-        <svg class="tel" viewBox="0 0 128 254" aria-hidden="true"><defs><clipPath id="pant-e"><rect x="7" y="7" width="114" height="240" rx="16"/></clipPath><clipPath id="img-e"><rect x="19" y="50" width="90" height="118" rx="11"/></clipPath></defs><rect width="128" height="254" rx="22" fill="#01120B"/><g clip-path="url(#pant-e)"><rect x="7" y="7" width="114" height="240" fill="#E6EFF8"/><g clip-path="url(#img-e)"><rect x="19" y="50" width="90" height="118" fill="#01120B"/><circle cx="84" cy="80" r="11" fill="#BFFE4D"/><path d="M19 168l30-44 20 26 14-14 26 32z" fill="#9133E7"/></g><rect x="19" y="184" width="62" height="6" rx="3" fill="rgba(1,18,11,.3)"/><rect x="19" y="197" width="40" height="6" rx="3" fill="rgba(1,18,11,.3)"/></g><rect x="50" y="13" width="28" height="6.5" rx="3.2" fill="#01120B"/></svg>
-        <figcaption><b>Una estática:</b> una sola imagen</figcaption>
-      </figure>
-    </div>
-    <p class="cuerpo a-txt rev">Cada contenido llega editado o diseñado, con su portada y su descripción. Además trae una historia de apoyo para acompañarlo.</p>
-  </div>
-</section>
-
-<!-- 8 · Los tres planes -->
-<section class="sec t-oscuro" id="planes">
+<!-- ===== BLOQUE COMPARTIDO · CIERRE · Igual en todas las páginas. La fuente es index.html. ===== -->
+<section class="sec sec-m t-morado cierre" id="cierre">
   <div class="caja">
-    <p class="kicker rev"><span class="num">07</span><span class="raya"></span></p>
-    <h2 class="tit t-h2 rev">Tres planes. Solo cambia la cantidad.</h2>
-    <div class="planes">
-      <article class="plan rev">
-        <h3 class="plan-n">Plan 8</h3>
-        <p class="plan-cifra" aria-hidden="true">8</p>
-        <p class="plan-lab">Contenidos al mes</p>
-        <dl><div><dt>Historias de apoyo</dt><dd>8</dd></div><div><dt>Ritmo</dt><dd>Unos 2 por semana</dd></div></dl>
-        <div class="plan-precios">
-          <p class="precio-solo"><span>Solo contenidos</span><b data-plan-solo="8">$1.600.000</b></p>
-          <p class="precio-comp"><span>Plan completo</span><strong data-plan-completo="8">$2.500.000</strong><small>al mes</small></p>
-          <p class="precio-trae">Con estrategia del mes, manejo de una red y pauta básica.</p>
-        </div>
-        <button type="button" class="btn btn-acido btn-ancho" data-elegir="p8" data-modo="completo">Elegir plan completo<span class="sr">: Plan 8</span></button>
-        <button type="button" class="enlace" data-elegir="p8" data-modo="solo">Solo contenidos<span class="sr">: Plan 8</span></button>
-      </article>
-      <article class="plan rec rev">
-        <p class="sello">Recomendado</p>
-        <h3 class="plan-n">Plan 12</h3>
-        <p class="plan-cifra" aria-hidden="true">12</p>
-        <p class="plan-lab">Contenidos al mes</p>
-        <dl><div><dt>Historias de apoyo</dt><dd>12</dd></div><div><dt>Ritmo</dt><dd>Unos 3 por semana</dd></div></dl>
-        <div class="plan-precios">
-          <p class="precio-solo"><span>Solo contenidos</span><b data-plan-solo="12">$2.400.000</b></p>
-          <p class="precio-comp"><span>Plan completo</span><strong data-plan-completo="12">$3.500.000</strong><small>al mes</small></p>
-          <p class="precio-trae">Con estrategia del mes, manejo de una red y pauta básica.</p>
-        </div>
-        <button type="button" class="btn btn-oscuro btn-ancho" data-elegir="p12" data-modo="completo">Elegir plan completo<span class="sr">: Plan 12</span></button>
-        <button type="button" class="enlace" data-elegir="p12" data-modo="solo">Solo contenidos<span class="sr">: Plan 12</span></button>
-      </article>
-      <article class="plan rev">
-        <h3 class="plan-n">Plan 15</h3>
-        <p class="plan-cifra" aria-hidden="true">15</p>
-        <p class="plan-lab">Contenidos al mes</p>
-        <dl><div><dt>Historias de apoyo</dt><dd>15</dd></div><div><dt>Ritmo</dt><dd>Casi 4 por semana</dd></div></dl>
-        <div class="plan-precios">
-          <p class="precio-solo"><span>Solo contenidos</span><b data-plan-solo="15">$3.000.000</b></p>
-          <p class="precio-comp"><span>Plan completo</span><strong data-plan-completo="15">$4.250.000</strong><small>al mes</small></p>
-          <p class="precio-trae">Con estrategia del mes, manejo de una red y pauta básica.</p>
-        </div>
-        <button type="button" class="btn btn-acido btn-ancho" data-elegir="p15" data-modo="completo">Elegir plan completo<span class="sr">: Plan 15</span></button>
-        <button type="button" class="enlace" data-elegir="p15" data-modo="solo">Solo contenidos<span class="sr">: Plan 15</span></button>
-      </article>
-    </div>
-    <div class="planes-pie rev">
-      <p class="dest dest-ac">Recomendado: Plan 12</p>
-      <p class="cuerpo">Con Plan 12 completo sales unas tres veces por semana y cada contenido te cuesta menos que en Plan 8 completo.</p>
-    </div>
+    <h2 class="tit t-h2 t-h2g rev">El siguiente paso es un mensaje</h2>
+    <p class="cuerpo cuerpo-g rev">Escríbenos por WhatsApp. Si ya hicimos tu diagnóstico, dinos qué plan quieres y arrancamos. Si no, empezamos por ahí: son 15 minutos y es gratis.</p>
+    <a class="btn btn-acido btn-g rev" data-wa href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Vi%20la%20p%C3%A1gina%20y%20quiero%20mi%20diagn%C3%B3stico%20de%2015%20minutos." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> Escríbenos por WhatsApp <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></a>
   </div>
 </section>
-
-<!-- 9 · Arma tu plan -->
-<section class="sec t-negro cotizador" id="cotizador">
-  <div class="caja">
-    <div class="cot-cab">
-      <p class="kicker"><span class="num">08</span><span class="raya"></span></p>
-      <h2 class="tit t-h2 t-h2g" id="cot-tit" tabindex="-1">Arma <em>tu plan</em></h2>
-      <p class="cuerpo">Dinos cuántos videos, carruseles y estáticas quieres dentro de tu plan. Puede ser todo en video, mitad y mitad o como lo necesite tu negocio.</p>
-    </div>
-
-    <div class="cot">
-      <div class="cot-controles">
-
-        <!-- Bloque 1: contenidos -->
-        <section class="bloque" aria-labelledby="b1">
-          <h3 class="bloque-tit" id="b1"><span class="n">1</span>Tus contenidos del mes</h3>
-          <div class="atajos" role="group" aria-label="Planes de ejemplo">
-            <button type="button" class="atajo" data-atajo="p8" aria-pressed="true">Plan 8</button>
-            <button type="button" class="atajo" data-atajo="p12" aria-pressed="false">Plan 12<span class="sr"> · Recomendado</span></button>
-            <button type="button" class="atajo" data-atajo="p15" aria-pressed="false">Plan 15</button>
-          </div>
-          <p class="nota"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg><span>Son ejemplos. La mezcla la decides tú.</span></p>
-
-          <div class="contadores">
-            <div class="contador" role="group" aria-labelledby="c-videos">
-              <span class="ficha-t v" aria-hidden="true"><svg class="ic"><use href="#i-video"/></svg></span>
-              <span class="contador-n" id="c-videos">Videos</span>
-              <span class="paso-a-paso">
-                <button type="button" class="pp" data-tipo="videos" data-d="-1" aria-label="Quitar un video"><svg class="ic" aria-hidden="true"><use href="#i-menos"/></svg></button>
-                <output class="pp-v" id="n-videos" aria-live="off">6</output>
-                <button type="button" class="pp" data-tipo="videos" data-d="1" aria-label="Agregar un video"><svg class="ic" aria-hidden="true"><use href="#i-mas"/></svg></button>
-              </span>
-            </div>
-            <div class="contador" role="group" aria-labelledby="c-carruseles">
-              <span class="ficha-t c" aria-hidden="true"><svg class="ic"><use href="#i-carrusel"/></svg></span>
-              <span class="contador-n" id="c-carruseles">Carruseles</span>
-              <span class="paso-a-paso">
-                <button type="button" class="pp" data-tipo="carruseles" data-d="-1" aria-label="Quitar un carrusel"><svg class="ic" aria-hidden="true"><use href="#i-menos"/></svg></button>
-                <output class="pp-v" id="n-carruseles" aria-live="off">2</output>
-                <button type="button" class="pp" data-tipo="carruseles" data-d="1" aria-label="Agregar un carrusel"><svg class="ic" aria-hidden="true"><use href="#i-mas"/></svg></button>
-              </span>
-            </div>
-            <div class="contador" role="group" aria-labelledby="c-estaticas">
-              <span class="ficha-t e" aria-hidden="true"><svg class="ic"><use href="#i-estatica"/></svg></span>
-              <span class="contador-n" id="c-estaticas">Estáticas</span>
-              <span class="paso-a-paso">
-                <button type="button" class="pp" data-tipo="estaticas" data-d="-1" aria-label="Quitar una estática"><svg class="ic" aria-hidden="true"><use href="#i-menos"/></svg></button>
-                <output class="pp-v" id="n-estaticas" aria-live="off">0</output>
-                <button type="button" class="pp" data-tipo="estaticas" data-d="1" aria-label="Agregar una estática"><svg class="ic" aria-hidden="true"><use href="#i-mas"/></svg></button>
-              </span>
-            </div>
-          </div>
-
-          <div class="ia-fila" id="ia-fila" role="group" aria-labelledby="c-ia">
-            <p class="ia-q" id="c-ia"><span class="ficha-t ia" aria-hidden="true"><svg class="ic"><use href="#i-chispa"/></svg></span>¿Cuántos de tus videos quieres con IA?</p>
-            <div class="ia-linea">
-              <p class="ia-nota">Los hacemos con inteligencia artificial: tú no los grabas. Cada uno suma <span data-p="videoIA">$250.000</span>.</p>
-              <span class="paso-a-paso">
-                <button type="button" class="pp" id="ia-menos" aria-label="Quitar un video con IA" disabled><svg class="ic" aria-hidden="true"><use href="#i-menos"/></svg></button>
-                <output class="pp-v" id="n-ia" aria-live="off">0</output>
-                <button type="button" class="pp" id="ia-mas" aria-label="Agregar un video con IA"><svg class="ic" aria-hidden="true"><use href="#i-mas"/></svg></button>
-              </span>
-            </div>
-            <p class="aviso" id="ia-aviso" hidden>Tu plan no tiene videos. Suma uno para poder hacerlo con IA.</p>
-          </div>
-
-          <div class="mezcla">
-            <div class="mezcla-fichas" id="fichas" role="img" aria-label="6 videos y 2 carruseles"></div>
-            <p class="fichas-ley" id="fichas-ley" hidden><span class="ficha-t ia" aria-hidden="true"><svg class="ic"><use href="#i-chispa"/></svg></span>Video con IA</p>
-            <p class="mezcla-pie"><b id="m-nombre">Plan 8:</b> <span id="m-trae">8 contenidos y 8 historias al mes</span></p>
-            <p class="limite" id="limite" aria-live="polite">8 es el mínimo. Para cambiar la mezcla, suma una pieza y luego quita otra.</p>
-          </div>
-        </section>
-
-        <!-- Bloque 2: adicionales mensuales -->
-        <section class="bloque" aria-labelledby="b2">
-          <h3 class="bloque-tit" id="b2"><span class="n">2</span>Adicionales al mes</h3>
-          <p class="bloque-sub">Ninguno es obligatorio. Se suman a tu plan cuando los necesites.</p>
-
-          <div class="completo" id="completo">
-            <div class="completo-t">
-              <p class="completo-n"><b id="k-nombre">Plan 8 completo</b> <span class="completo-p"><b id="k-precio">$2.500.000</b> al mes</span></p>
-              <p class="completo-d">Tus contenidos con estrategia del mes, manejo de una red y pauta básica.</p>
-            </div>
-            <button type="button" class="btn btn-acido" id="btn-completo">Quiero el plan completo</button>
-            <p class="completo-ok" id="k-ok" hidden><svg class="ic" aria-hidden="true"><use href="#i-palomita"/></svg>Ya tienes el plan completo.</p>
-          </div>
-
-          <label class="op op-fila" id="op-estrategia">
-            <input type="checkbox" id="in-estrategia">
-            <span class="marca-c" aria-hidden="true"><svg class="ic"><use href="#i-palomita"/></svg></span>
-            <span class="op-txt">
-              <span class="op-n">Estrategia del mes</span>
-              <span class="op-d">Mensaje, temas, enfoque y calendario del mes.</span>
-              <span class="op-p"><span data-p="estrategia">$250.000</span> al mes</span>
-            </span>
-          </label>
-
-          <fieldset class="op op-grupo" id="op-redes">
-            <legend class="sr">Manejo de redes, con community manager</legend>
-            <div class="op-cab" aria-hidden="true">
-              <svg class="ic"><use href="#i-chat"/></svg>
-              <div class="op-txt">
-                <span class="op-n">Manejo de redes, con community manager</span>
-                <span class="op-d">Publicamos y respondemos por ti.</span>
-                <span class="op-p">Primera red <span data-calc="primeraRed">$400.000</span> al mes · cada red adicional <span data-p="redAdicional">$300.000</span></span>
-              </div>
-            </div>
-            <div class="chips">
-              <label class="chip"><input type="checkbox" data-red="Instagram"><span class="marca-c" aria-hidden="true"><svg class="ic"><use href="#i-palomita"/></svg></span><span>Instagram</span></label>
-              <label class="chip"><input type="checkbox" data-red="Facebook"><span class="marca-c" aria-hidden="true"><svg class="ic"><use href="#i-palomita"/></svg></span><span>Facebook</span></label>
-              <label class="chip"><input type="checkbox" data-red="TikTok"><span class="marca-c" aria-hidden="true"><svg class="ic"><use href="#i-palomita"/></svg></span><span>TikTok</span></label>
-              <label class="chip"><input type="checkbox" data-red="LinkedIn"><span class="marca-c" aria-hidden="true"><svg class="ic"><use href="#i-palomita"/></svg></span><span>LinkedIn</span></label>
-            </div>
-          </fieldset>
-
-          <fieldset class="op op-grupo" id="op-pauta">
-            <legend class="sr">Pauta</legend>
-            <div class="op-cab" aria-hidden="true">
-              <svg class="ic"><use href="#i-pauta"/></svg>
-              <div class="op-txt">
-                <span class="op-n">Pauta</span>
-                <span class="op-d">Manejamos tus anuncios. La inversión en anuncios va aparte.</span>
-              </div>
-            </div>
-            <div class="radios">
-              <label class="chip"><input type="radio" name="pauta" value="ninguna" checked><span class="marca-r" aria-hidden="true"></span><span>Sin pauta</span></label>
-              <label class="chip"><input type="radio" name="pauta" value="basica"><span class="marca-r" aria-hidden="true"></span><span class="chip-t"><b>Pauta básica</b><span>Una campaña con tu mejor contenido del mes</span></span><span class="chip-p" data-p="pautaBasica">$250.000</span></label>
-              <label class="chip"><input type="radio" name="pauta" value="completa"><span class="marca-r" aria-hidden="true"></span><span class="chip-t"><b>Pauta completa</b><span>Varias campañas y públicos, con ajuste cada semana</span></span><span class="chip-p" data-p="pautaCompleta">$1.000.000</span></label>
-            </div>
-          </fieldset>
-        </section>
-
-        <!-- Bloque 3: una sola vez -->
-        <section class="bloque" aria-labelledby="b3">
-          <h3 class="bloque-tit" id="b3"><span class="n">3</span>Adicionales de una sola vez</h3>
-          <p class="bloque-sub">Se pagan una vez, no cada mes.</p>
-
-          <fieldset class="op op-grupo" id="op-speak">
-            <legend class="sr">Speak: más entrenamiento para cámara</legend>
-            <div class="op-cab" aria-hidden="true">
-              <svg class="ic"><use href="#i-voz"/></svg>
-              <div class="op-txt">
-                <span class="op-n">Speak</span>
-                <span class="op-d">Más entrenamiento para cámara. Clases virtuales.</span>
-              </div>
-            </div>
-            <div class="radios">
-              <label class="chip"><input type="radio" name="speak" value="ninguno" checked><span class="marca-r" aria-hidden="true"></span><span>Sin Speak</span></label>
-              <label class="chip"><input type="radio" name="speak" value="pro"><span class="marca-r" aria-hidden="true"></span><span class="chip-t"><b>Speak Pro</b><span>4 clases</span></span><span class="chip-p" data-p="speakPro">$800.000</span></label>
-              <label class="chip"><input type="radio" name="speak" value="promax"><span class="marca-r" aria-hidden="true"></span><span class="chip-t"><b>Speak Pro Max</b><span>8 clases</span></span><span class="chip-p" data-p="speakProMax">$1.600.000</span></label>
-            </div>
-          </fieldset>
-        </section>
-        <!-- Bloque 4: otros servicios, sin precio: no cambian el total -->
-        <section class="bloque" aria-labelledby="b4">
-          <h3 class="bloque-tit" id="b4"><span class="n">4</span>¿Algo más para tu negocio?</h3>
-          <p class="bloque-sub">Se cotiza en el diagnóstico. No cambia el total de tu plan.</p>
-          <fieldset class="op op-grupo" id="op-interes">
-            <legend class="sr">¿Algo más para tu negocio?</legend>
-            <div class="chips chips-2">
-              <label class="chip"><input type="checkbox" data-interes="página web"><span class="marca-c" aria-hidden="true"><svg class="ic"><use href="#i-palomita"/></svg></span><span>Página web</span></label>
-              <label class="chip"><input type="checkbox" data-interes="automatización de procesos"><span class="marca-c" aria-hidden="true"><svg class="ic"><use href="#i-palomita"/></svg></span><span>Automatización de procesos</span></label>
-              <label class="chip"><input type="checkbox" data-interes="capacitación en IA"><span class="marca-c" aria-hidden="true"><svg class="ic"><use href="#i-palomita"/></svg></span><span>Capacitación en IA</span></label>
-              <label class="chip"><input type="checkbox" data-interes="portafolio y presentaciones"><span class="marca-c" aria-hidden="true"><svg class="ic"><use href="#i-palomita"/></svg></span><span>Portafolio y presentaciones</span></label>
-            </div>
-          </fieldset>
-        </section>
-      </div>
-
-      <!-- Resultado -->
-      <aside class="resumen" aria-labelledby="r-tit">
-        <p class="resumen-k" id="r-tit">Tu plan</p>
-        <p class="resumen-nombre"><span id="r-nombre">Plan 8</span> <span class="sello" id="r-completo" hidden>completo</span></p>
-        <p class="resumen-mezcla" id="r-mezcla">6 videos y 2 carruseles</p>
-        <ul class="resumen-lineas" id="r-lineas">
-          <li><span>8 contenidos y 8 historias</span><b>$1.600.000</b></li>
-        </ul>
-        <div class="resumen-total">
-          <span id="r-rotulo">Total al mes</span>
-          <strong id="r-grande" aria-hidden="true">$1.600.000</strong>
-          <p class="resumen-despues" id="r-despues" aria-hidden="true" hidden>Después, <b id="r-mensual">$1.600.000</b> al mes</p>
-        </div>
-        <dl class="resumen-filas">
-          <div id="r-unavez-fila" hidden><dt>De eso, una sola vez</dt><dd id="r-unavez" aria-hidden="true">$0</dd></div>
-        </dl>
-        <p class="resumen-interes" id="r-interes" hidden></p>
-        <p class="sr" id="r-vivo" role="status" aria-live="polite" aria-atomic="true">Plan 8. Total al mes: $1.600.000.</p>
-        <p class="resumen-falta" id="r-falta">Con estrategia, una red y pauta básica es el plan completo: $2.500.000 al mes.</p>
-        <a class="btn btn-oscuro btn-ancho" id="r-wa" data-wa data-plan-wa href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Arm%C3%A9%20este%20plan%20en%20la%20p%C3%A1gina%3A%20Plan%208%20(6%20videos%20y%202%20carruseles).%20Mensual%3A%20%241.600.000.%20Quiero%20mi%20diagn%C3%B3stico%20de%2015%20minutos." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> Enviar mi plan por WhatsApp</a>
-        <p class="resumen-nota">Empezamos con un diagnóstico de 15 minutos, gratis.</p>
-      </aside>
-    </div>
-  </div>
-</section>
-
-<!-- 10 · Lo que trae y lo que no -->
-<section class="sec t-claro" id="incluye">
-  <div class="caja dos-col areas">
-    <div class="a-cab">
-      <p class="kicker rev"><span class="num">09</span><span class="raya"></span></p>
-      <h2 class="tit t-h2 rev">Lo que trae cualquier plan</h2>
-    </div>
-    <div class="a-graf">
-      <ul class="lista">
-        <li class="rev"><svg class="ic" aria-hidden="true"><use href="#i-guion"/></svg><span>Guiones de los videos y textos de las otras piezas</span></li>
-        <li class="rev"><svg class="ic" aria-hidden="true"><use href="#i-camara"/></svg><span>Un día de grabación de 4 a 6 horas, con dirección</span></li>
-        <li class="rev"><svg class="ic" aria-hidden="true"><use href="#i-mic"/></svg><span>Micrófonos, trípodes y luces PRO</span></li>
-        <li class="rev"><svg class="ic" aria-hidden="true"><use href="#i-edicion"/></svg><span>Edición o diseño, portada y descripción de cada pieza</span></li>
-        <li class="rev"><svg class="ic" aria-hidden="true"><use href="#i-historia"/></svg><span>Una historia de apoyo por contenido</span></li>
-        <li class="rev"><svg class="ic" aria-hidden="true"><use href="#i-ajustes"/></svg><span>Una ronda de ajustes por pieza</span></li>
-      </ul>
-      <div class="panel panel-fila rev">
-        <svg class="ic" aria-hidden="true"><use href="#i-voz"/></svg>
-        <p>Antes de grabar tienes dos sesiones de preparación para cámara, una virtual y una práctica. Las llamamos Speak Lite. La grabación y esas sesiones aplican si tu plan tiene videos.</p>
-      </div>
-    </div>
-    <div class="no-incluye a-txt rev">
-      <span class="no-x" aria-hidden="true"><svg class="ic"><use href="#i-equis"/></svg></span>
-      <p>Publicar, responder mensajes, la estrategia y la pauta se suman aparte. El plan completo ya los trae.</p>
-    </div>
-  </div>
-</section>
-
-<!-- 11 · Primeros 30 días y garantía -->
-<section class="sec t-oscuro" id="treinta">
-  <div class="caja dos-col">
-    <div>
-      <p class="kicker rev"><span class="num">10</span><span class="raya"></span></p>
-      <h2 class="tit t-h2 rev">Tus primeros 30 días</h2>
-      <ol class="pasos pasos-2">
-        <li class="rev"><span class="n">1</span><span>Diagnóstico de 15 minutos</span></li>
-        <li class="rev"><span class="n">2</span><span>Estrategia del mes y guiones</span></li>
-        <li class="rev"><span class="n">3</span><span><b>Preparación para cámara:</b> dos sesiones</span></li>
-        <li class="rev"><span class="n">4</span><span>Un solo día de grabación</span></li>
-        <li class="rev"><span class="n">5</span><span>Edición, diseño y entrega</span></li>
-        <li class="rev"><span class="n">6</span><span>Una ronda de ajustes por pieza</span></li>
-      </ol>
-    </div>
-    <div class="garantia rev">
-      <svg class="ic ic-g" aria-hidden="true"><use href="#i-sello"/></svg>
-      <p class="dest">Garantizamos el número de piezas y la fecha de entrega.</p>
-      <p class="cuerpo">Antes de empezar acordamos contigo cuántas piezas son y qué día las recibes. Eso depende de nosotros y eso es lo que garantizamos. No prometemos ventas ni seguidores, porque nadie los controla.</p>
-    </div>
-  </div>
-</section>
-
-<!-- 12 · Preguntas -->
-<section class="sec t-claro" id="preguntas">
-  <div class="caja dos-col">
-    <div class="pegado">
-      <p class="kicker rev"><span class="num">11</span><span class="raya"></span></p>
-      <h2 class="tit t-h2 rev">Preguntas</h2>
-    </div>
-    <div class="faq rev">
-      <div class="faq-i">
-        <h3><button type="button" class="faq-b" aria-expanded="false" aria-controls="f1" id="fb1"><span>¿Tengo que salir yo en los videos?</span><svg class="ic" aria-hidden="true"><use href="#i-mas"/></svg></button></h3>
-        <div class="faq-p" id="f1" role="region" aria-labelledby="fb1"><div><p>Tú decides. Un contenido puede ser un video, un carrusel o una estática, y la mezcla la armas tú. Si quieres salir menos, parte de tus videos se pueden hacer con IA.</p></div></div>
-      </div>
-      <div class="faq-i">
-        <h3><button type="button" class="faq-b" aria-expanded="false" aria-controls="f8" id="fb8"><span>¿Qué es el plan completo?</span><svg class="ic" aria-hidden="true"><use href="#i-mas"/></svg></button></h3>
-        <div class="faq-p" id="f8" role="region" aria-labelledby="fb8"><div><p>Tus contenidos del mes con la estrategia, el manejo de una red con community manager y pauta básica. Es el que recomendamos.</p></div></div>
-      </div>
-      <div class="faq-i">
-        <h3><button type="button" class="faq-b" aria-expanded="false" aria-controls="f2" id="fb2"><span>¿Cuánto tiempo me quita al mes?</span><svg class="ic" aria-hidden="true"><use href="#i-mas"/></svg></button></h3>
-        <div class="faq-p" id="f2" role="region" aria-labelledby="fb2"><div><p>Un día de grabación de 4 a 6 horas y dos sesiones cortas de preparación para cámara. Del resto nos encargamos nosotros.</p></div></div>
-      </div>
-      <div class="faq-i">
-        <h3><button type="button" class="faq-b" aria-expanded="false" aria-controls="f3" id="fb3"><span>¿Ustedes publican y responden los mensajes?</span><svg class="ic" aria-hidden="true"><use href="#i-mas"/></svg></button></h3>
-        <div class="faq-p" id="f3" role="region" aria-labelledby="fb3"><div><p>Sí, si sumas el manejo de redes: viene en el plan completo. Si armas tu plan solo con contenidos, te entregamos las piezas listas y las publicas tú.</p></div></div>
-      </div>
-      <div class="faq-i">
-        <h3><button type="button" class="faq-b" aria-expanded="false" aria-controls="f4" id="fb4"><span>¿Necesito pagar pauta?</span><svg class="ic" aria-hidden="true"><use href="#i-mas"/></svg></button></h3>
-        <div class="faq-p" id="f4" role="region" aria-labelledby="fb4"><div><p>No es obligatorio. El plan completo trae pauta básica: una campaña con tu mejor contenido del mes. La inversión en anuncios la pagas tú aparte.</p></div></div>
-      </div>
-      <div class="faq-i">
-        <h3><button type="button" class="faq-b" aria-expanded="false" aria-controls="f5" id="fb5"><span>¿Qué pasa si quiero más contenido?</span><svg class="ic" aria-hidden="true"><use href="#i-mas"/></svg></button></h3>
-        <div class="faq-p" id="f5" role="region" aria-labelledby="fb5"><div><p>Antes del día de grabación, cualquier pieza se suma a tu plan. Después de grabar, un video suelto exige volver a grabar, así que conviene decidir antes.</p></div></div>
-      </div>
-      <div class="faq-i">
-        <h3><button type="button" class="faq-b" aria-expanded="false" aria-controls="f6" id="fb6"><span>¿Qué garantizan?</span><svg class="ic" aria-hidden="true"><use href="#i-mas"/></svg></button></h3>
-        <div class="faq-p" id="f6" role="region" aria-labelledby="fb6"><div><p>El número de piezas y la fecha de entrega, que es lo que depende de nosotros. No prometemos ventas ni seguidores, porque nadie los controla.</p></div></div>
-      </div>
-      <div class="faq-i">
-        <h3><button type="button" class="faq-b" aria-expanded="false" aria-controls="f7" id="fb7"><span>¿Cómo empezamos?</span><svg class="ic" aria-hidden="true"><use href="#i-mas"/></svg></button></h3>
-        <div class="faq-p" id="f7" role="region" aria-labelledby="fb7"><div><p>Con un diagnóstico de 15 minutos, gratis, por WhatsApp.</p></div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 13 · Cierre -->
-<section class="sec t-morado cierre" id="cierre">
-  <div class="caja">
-    <div class="cierre-red">
-      <div>
-        <img class="cierre-logo rev" src="assets/img/logo-cj-blanco.png" width="400" height="150" alt="CJ Casa Digital" loading="lazy">
-        <h2 class="tit t-h2 t-h2g rev">El siguiente paso es un mensaje</h2>
-        <p class="cuerpo cuerpo-g rev">Escríbenos por WhatsApp. Si ya hicimos tu diagnóstico, dinos qué plan quieres y arrancamos. Si no, empezamos por ahí: son 15 minutos y es gratis.</p>
-        <a class="btn btn-acido btn-g rev" data-wa href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Vi%20la%20p%C3%A1gina%20y%20quiero%20mi%20diagn%C3%B3stico%20de%2015%20minutos." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> Escríbenos por WhatsApp <svg class="ic" aria-hidden="true"><use href="#i-flecha"/></svg></a>
-      </div>
-      <div class="cierre-lado rev">
-        <h3 class="grupo">Portafolios en PDF</h3>
-        <ul class="pdfs">
-          <li><a href="portafolios/cj-portafolio-general.pdf" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-portada"/></svg><span class="pdf-t"><b>Portafolio general</b><span>Todos los servicios en un solo documento.</span></span><small>PDF</small></a></li>
-          <li><a href="portafolios/cj-planes-de-contenido.pdf" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-portada"/></svg><span class="pdf-t"><b>Planes de contenido</b><span>Plan 8, Plan 12 y Plan 15, de solo contenidos al plan completo.</span></span><small>PDF</small></a></li>
-          <li><a href="portafolios/cj-scale-ai.pdf" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-portada"/></svg><span class="pdf-t"><b>Scale AI</b><span>Videos con IA dentro de tu plan.</span></span><small>PDF</small></a></li>
-          <li><a href="portafolios/cj-speak.pdf" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-portada"/></svg><span class="pdf-t"><b>Speak</b><span>Entrenamiento para hablar frente a cámara.</span></span><small>PDF</small></a></li>
-          <li><a href="portafolios/cj-start-content.pdf" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-portada"/></svg><span class="pdf-t"><b>Start Content</b><span>4 videos en 15 días, pago único.</span></span><small>PDF</small></a></li>
-        </ul>
-      </div>
-    </div>
-    <footer class="pie">
-      <p class="lema">Potencia tu marca</p>
-      <p class="servicios">Marketing Digital · Contenido · Comunicación · Redes Sociales · Inteligencia Artificial</p>
-      <div class="pie-datos">
-        <p>CJ Casa Digital · Bogotá, Colombia</p>
-        <ul>
-          <li><a data-wa href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Vi%20la%20p%C3%A1gina%20y%20quiero%20mi%20diagn%C3%B3stico%20de%2015%20minutos." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg>WhatsApp: +57 305 200 7745</a></li>
-          <li><a href="mailto:cjcasadigital@gmail.com"><svg class="ic" aria-hidden="true"><use href="#i-correo"/></svg>cjcasadigital@gmail.com</a></li>
-          <li><a href="https://www.cjcasadigital.com/"><svg class="ic" aria-hidden="true"><use href="#i-web"/></svg>www.cjcasadigital.com</a></li>
-        </ul>
-        <!-- PENDIENTE: razón social, NIT, política de tratamiento de datos y términos -->
-        <p>© 2026</p>
-      </div>
-    </footer>
-  </div>
-</section>
+<!-- ===== FIN DEL BLOQUE COMPARTIDO · CIERRE ===== -->
 
 </main>
 
-<!-- Barra inferior del celular: el plan armado, siempre a la mano -->
-<div class="plan-barra" id="plan-barra" aria-hidden="true">
-  <div class="plan-barra-t">
-    <span id="pb-nombre">Plan 8 · al mes</span>
-    <strong id="pb-total">$1.600.000</strong>
-    <small id="pb-despues" hidden>después <b id="pb-mensual">$1.600.000</b> al mes</small>
+<!-- ===== BLOQUE COMPARTIDO · PIE · Igual en todas las páginas. La fuente es index.html: se copia de ahí
+     y solo cambia aria-current="page". ===== -->
+<footer class="pie t-oscuro" id="mapa">
+  <div class="caja">
+    <div class="pie-red">
+      <div class="pie-marca">
+        <a class="marca" href="/" aria-label="CJ Casa Digital, inicio"><img src="/assets/img/logo-cj-blanco.png" width="400" height="150" alt="CJ Casa Digital" loading="lazy"></a>
+        <p class="lema">Potencia tu marca</p>
+        <p class="servicios">Marketing Digital · Contenido · Comunicación · Redes Sociales · Inteligencia Artificial</p>
+      </div>
+      <nav class="pie-col" aria-labelledby="pie-paginas">
+        <h2 class="grupo" id="pie-paginas">Páginas</h2>
+        <ul>
+          <li><a href="/" aria-current="page">Inicio</a></li>
+          <li><a href="/planes/">Planes y precios</a></li>
+          <li><a href="/planes/#arma-tu-plan">Arma tu plan</a></li>
+          <li><a href="/como-funciona/">Cómo funciona</a></li>
+          <li><a href="/otros-servicios/">Otros servicios</a></li>
+          <li><a href="/portafolios/">Portafolios</a></li>
+          <li><a href="/planes/#preguntas">Preguntas</a></li>
+        </ul>
+      </nav>
+      <nav class="pie-col" aria-labelledby="pie-pdf">
+        <h2 class="grupo" id="pie-pdf">Portafolios en PDF</h2>
+        <ul>
+          <li><a href="/portafolios/cj-portafolio-general.pdf" target="_blank" rel="noopener">Portafolio general <small>PDF</small></a></li>
+          <li><a href="/portafolios/cj-planes-de-contenido.pdf" target="_blank" rel="noopener">Planes de contenido <small>PDF</small></a></li>
+          <li><a href="/portafolios/cj-scale-ai.pdf" target="_blank" rel="noopener">Scale AI <small>PDF</small></a></li>
+          <li><a href="/portafolios/cj-speak.pdf" target="_blank" rel="noopener">Speak <small>PDF</small></a></li>
+          <li><a href="/portafolios/cj-start-content.pdf" target="_blank" rel="noopener">Start Content <small>PDF</small></a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="pie-datos">
+      <p>CJ Casa Digital · Bogotá, Colombia</p>
+      <ul>
+        <li><a data-wa href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Vi%20la%20p%C3%A1gina%20y%20quiero%20mi%20diagn%C3%B3stico%20de%2015%20minutos." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg>WhatsApp: +57 305 200 7745</a></li>
+        <li><a href="mailto:cjcasadigital@gmail.com"><svg class="ic" aria-hidden="true"><use href="#i-correo"/></svg>cjcasadigital@gmail.com</a></li>
+        <li><a href="https://www.cjcasadigital.com/"><svg class="ic" aria-hidden="true"><use href="#i-web"/></svg>www.cjcasadigital.com</a></li>
+      </ul>
+      <!-- PENDIENTE: razón social, NIT, política de tratamiento de datos y términos -->
+      <p>© 2026</p>
+    </div>
   </div>
-  <a class="btn btn-acido btn-ch" id="pb-wa" data-wa data-plan-wa tabindex="-1" href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Arm%C3%A9%20este%20plan%20en%20la%20p%C3%A1gina%3A%20Plan%208%20(6%20videos%20y%202%20carruseles).%20Mensual%3A%20%241.600.000.%20Quiero%20mi%20diagn%C3%B3stico%20de%2015%20minutos." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> Enviar por WhatsApp</a>
-</div>
+</footer>
+<!-- ===== FIN DEL BLOQUE COMPARTIDO · PIE ===== -->
+
+<!-- Fijo abajo en celular: WhatsApp. En Planes y precios no va: ahí está la barra del plan armado. -->
+<a class="wa-flota" id="wa-flota" data-wa href="https://wa.me/573052007745?text=Hola%2C%20CJ.%20Vi%20la%20p%C3%A1gina%20y%20quiero%20mi%20diagn%C3%B3stico%20de%2015%20minutos." target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp"><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg><span aria-hidden="true">WhatsApp</span></a>
 
 </body>
 </html>

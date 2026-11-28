@@ -1,10 +1,12 @@
-/* CJ Casa Digital · landing · sin dependencias */
+/* CJ Casa Digital · sitio · sin dependencias
+   Un solo archivo para todas las páginas: cada parte revisa si su bloque existe antes de actuar
+   (el cotizador solo está en /planes/, el calendario solo en el inicio). */
 
 /* Medición: con pixelId vacío no se carga nada de Meta. Los eventos igual quedan en window.dataLayer. */
 const CJ_CONFIG = { pixelId: "" };
 
 /* Todo el cálculo del cotizador sale de aquí. Para cambiar un precio, cámbialo solo en este objeto:
-   la página (inicio, tarjetas de planes, rótulos del cotizador, total y mensaje de WhatsApp) lo toma de aquí.
+   el sitio (inicio, menú, tarjetas de planes, rótulos del cotizador, total, Start Content, Speak y mensaje de WhatsApp) lo toma de aquí.
    Los valores escritos en index.html son solo lo que se ve si el navegador no corre JavaScript.
 
    Cómo se arma el precio: solo los contenidos cuestan `porContenido` cada uno, y encima se suma lo que la persona marque.
@@ -38,6 +40,7 @@ const CJ_PLAN = {
     pro:    { nombre: "Speak Pro", precio: 800000 },
     promax: { nombre: "Speak Pro Max", precio: 1600000 }
   },
+  startContent: { nombre: "Start Content", precio: 1200000 },   // pago único: 3 videos y 1 hecho con IA en 15 días. No entra al cotizador
   mensajeGeneral: "Hola, CJ. Vi la página y quiero mi diagnóstico de 15 minutos."
 };
 
@@ -161,12 +164,17 @@ const CJ_PLAN = {
   }
 
   /* ---------- WhatsApp ---------- */
+  /* La referencia de campaña (utm_campaign o utm_source) se guarda mientras dure la visita, para que no se pierda
+     al pasar de una página a otra: quien llega al inicio desde un anuncio y arma el plan en /planes/ sigue llevando su "Ref: …". */
   var referencia = (function () {
+    var limpia = function (v) { return String(v || "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, 80); };
+    var v = "";
+    try { var q = new URLSearchParams(window.location.search); v = limpia(q.get("utm_campaign") || q.get("utm_source")); } catch (err) {}
     try {
-      var q = new URLSearchParams(window.location.search);
-      var v = q.get("utm_campaign") || q.get("utm_source") || "";
-      return v.replace(/[\u0000-\u001f]/g, " ").trim().slice(0, 80);
-    } catch (err) { return ""; }
+      if (v) window.sessionStorage.setItem("cj_ref", v);
+      else v = limpia(window.sessionStorage.getItem("cj_ref"));
+    } catch (err) {}
+    return v;
   })();
   function conReferencia(texto) { return referencia ? texto + " Ref: " + referencia : texto; }
   function enlaceWa(texto) { return "https://wa.me/" + P.whatsapp + "?text=" + encodeURIComponent(conReferencia(texto)); }
@@ -352,7 +360,7 @@ const CJ_PLAN = {
       estrategia: P.estrategia, redAdicional: P.redes.adicional,
       pautaBasica: P.pauta.basica.precio, pautaCompleta: P.pauta.completa.precio,
       videoIA: P.videoConIA,
-      speakPro: P.speak.pro.precio, speakProMax: P.speak.promax.precio
+      speakPro: P.speak.pro.precio, speakProMax: P.speak.promax.precio, startContent: P.startContent.precio
     };
     todos("[data-p]").forEach(function (el) { var k = el.getAttribute("data-p"); if (k in mapa) el.textContent = pesos(mapa[k]); });
     todos("[data-plan-solo]").forEach(function (el) { el.textContent = pesos(precioSolo(Number(el.getAttribute("data-plan-solo")))); });
@@ -424,7 +432,7 @@ const CJ_PLAN = {
     todos("[data-elegir]").forEach(function (b) {
       b.addEventListener("click", function () {
         ponerPlan(b.getAttribute("data-elegir"), b.getAttribute("data-modo")); cambio();
-        var destino = $("cotizador"), titulo = $("cot-tit");
+        var destino = $("arma-tu-plan"), titulo = $("cot-tit");
         if (destino) destino.scrollIntoView({ behavior: sinMovimiento ? "auto" : "smooth", block: "start" });
         if (titulo) titulo.focus({ preventScroll: true });
       });
@@ -439,7 +447,8 @@ const CJ_PLAN = {
 
   /* ---------- Calendario del inicio: cada día es un botón ----------
      La persona marca los días en que quiere publicar (de `minimo` a `maximo`) y ve cuánto vale ese mes en solo
-     contenidos. "Armar este plan" lleva esa cantidad al cotizador. Sin JavaScript queda la imagen del mes. */
+     contenidos. "Armar este plan" es un enlace a /planes/ que lleva esa cantidad en la dirección
+     (?contenidos=10) y el cotizador la lee al cargar. Sin JavaScript queda la imagen del mes. */
   var DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"];
   /* Reparte una cantidad de contenidos: con 8, 12 o 15 usa la mezcla de ejemplo; con las intermedias,
      la mezcla de ejemplo anterior y el resto en videos (lo mismo que tocar "+" en Videos). */
@@ -476,6 +485,7 @@ const CJ_PLAN = {
       var n = cuantas();
       texto("cal-n", cuantos(n, "publicación", "publicaciones"));
       texto("cal-precio", pesos(precioSolo(n)));
+      if ($("cal-armar")) $("cal-armar").setAttribute("href", "/planes/?contenidos=" + n + "#arma-tu-plan");   // el cotizador la lee al cargar
     }
     function avisar(dicho) {
       var aviso = $("cal-aviso"); if (!aviso) return;
@@ -496,13 +506,84 @@ const CJ_PLAN = {
       avisar("");
       contar();
     });
-    if ($("cal-armar")) $("cal-armar").addEventListener("click", function () {
-      ponerCantidad(cuantas()); cambio();
-      var destino = $("cotizador"), titulo = $("cot-tit");
-      if (destino) destino.scrollIntoView({ behavior: sinMovimiento ? "auto" : "smooth", block: "start" });
-      if (titulo) titulo.focus({ preventScroll: true });
-    });
     contar();
+  }
+
+  /* ---------- Lo que llega en la dirección de /planes/ ----------
+     ?contenidos=10 (del calendario del inicio) y ?speak=pro o ?speak=promax ("Sumarlo a mi plan", en Otros servicios). */
+  function deLaDireccion() {
+    if (!$("arma-tu-plan")) return false;
+    var q, hubo = false;
+    try { q = new URLSearchParams(window.location.search); } catch (err) { return false; }
+    var n = parseInt(q.get("contenidos"), 10);
+    if (n >= P.minimo && n <= P.maximo) { ponerCantidad(n); hubo = true; }
+    var sp = q.get("speak");
+    if (sp && P.speak.hasOwnProperty(sp)) { estado.speak = sp; hubo = true; }
+    return hubo;
+  }
+
+  /* ---------- Menú del celular ----------
+     El menú está escrito en el HTML. Aquí solo se abre y se cierra: botón, Escape, y el foco no sale del menú mientras está abierto. */
+  function menu() {
+    var barra = $("barra"), boton = $("menu-btn"), panel = $("menu");
+    if (!barra || !boton || !panel) return;
+    var fuera = todos("main, footer, .plan-barra, .wa-flota, .salto");
+    var ancho = window.matchMedia ? window.matchMedia("(min-width: 1000px)") : null;
+    function abierto() { return boton.getAttribute("aria-expanded") === "true"; }
+    function poner(abrir, devolverFoco) {
+      boton.setAttribute("aria-expanded", String(abrir));
+      boton.setAttribute("aria-label", abrir ? "Cerrar el menú" : "Abrir el menú");
+      barra.classList.toggle("abierta", abrir);
+      d.documentElement.classList.toggle("menu-abierto", abrir);
+      fuera.forEach(function (el) { if (abrir) el.setAttribute("inert", ""); else el.removeAttribute("inert"); });
+      if (abrir) panel.scrollTop = 0;
+      if (!abrir && devolverFoco) boton.focus();
+    }
+    boton.addEventListener("click", function () { poner(!abierto()); });
+    panel.addEventListener("click", function (ev) {       // un enlace a esta misma página (un ancla) cierra el menú
+      if (ev.target.closest && ev.target.closest("a")) poner(false);
+    });
+    d.addEventListener("keydown", function (ev) {
+      if (!abierto()) return;
+      if (ev.key === "Escape") { ev.preventDefault(); poner(false, true); return; }
+      if (ev.key !== "Tab") return;
+      var focos = todos("a[href], button:not([disabled])", barra).filter(function (el) { return el.getClientRects().length > 0; });
+      if (!focos.length) return;
+      var primero = focos[0], ultimo = focos[focos.length - 1], aqui = d.activeElement;
+      if (!barra.contains(aqui)) { ev.preventDefault(); primero.focus(); }
+      else if (ev.shiftKey && aqui === primero) { ev.preventDefault(); ultimo.focus(); }
+      else if (!ev.shiftKey && aqui === ultimo) { ev.preventDefault(); primero.focus(); }
+    });
+    if (ancho) {
+      var alCambiar = function () { if (ancho.matches && abierto()) poner(false); };
+      if (ancho.addEventListener) ancho.addEventListener("change", alCambiar); else if (ancho.addListener) ancho.addListener(alCambiar);
+    }
+  }
+
+  /* ---------- Pestañas de /planes/: marcan en qué parte de la página vas ---------- */
+  function pestanas() {
+    var nav = $("pestanas");
+    if (!nav || !("IntersectionObserver" in window)) return;
+    var lista = nav.querySelector("ul"), enlaces = todos("a", nav), a_la_vista = {};
+    var partes = enlaces.map(function (a) { return $(a.getAttribute("href").slice(1)); });
+    function marcar() {
+      var actual = null;
+      partes.forEach(function (parte, k) { if (parte && a_la_vista[parte.id] && !actual) actual = enlaces[k]; });
+      enlaces.forEach(function (a) {
+        if (a === actual) {
+          if (a.getAttribute("aria-current") !== "location") {
+            a.setAttribute("aria-current", "location");
+            if (lista && lista.scrollWidth > lista.clientWidth) lista.scrollTo({ left: Math.max(0, a.offsetLeft - 20), behavior: sinMovimiento ? "auto" : "smooth" });
+          }
+        } else a.removeAttribute("aria-current");
+      });
+      if (!actual && lista && lista.scrollLeft) lista.scrollTo({ left: 0, behavior: "auto" });
+    }
+    var obs = new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (en) { a_la_vista[en.target.id] = en.isIntersecting; });
+      marcar();
+    }, { rootMargin: "-30% 0px -65% 0px", threshold: 0 });
+    partes.forEach(function (parte) { if (parte) obs.observe(parte); });
   }
 
   /* ---------- Preguntas ---------- */
@@ -519,7 +600,9 @@ const CJ_PLAN = {
 
   /* ---------- Entradas, calendario y barras ---------- */
   function movimiento() {
-    var revs = todos(".rev"), cal = $("cal"), barra = $("plan-barra"), inicio = $("inicio"), cot = $("cotizador");
+    var revs = todos(".rev"), cal = $("cal"), cot = $("arma-tu-plan");
+    var inicio = $("inicio") || $("cabecera");                 // el primer bloque de la página
+    var barra = $("plan-barra"), flota = $("wa-flota");        // lo fijo de abajo en celular: uno u otro, según la página
     if (!("IntersectionObserver" in window)) {
       revs.forEach(function (el) { el.classList.add("visto"); });
       if (cal) cal.classList.add("on");
@@ -549,6 +632,9 @@ const CJ_PLAN = {
         if (enlaceBarra) enlaceBarra.tabIndex = mostrar ? 0 : -1;
       }, { threshold: 0 }).observe(inicio);
     }
+    if (flota && inicio) {
+      new IntersectionObserver(function (entradas) { flota.classList.toggle("ver", !entradas[0].isIntersecting); }, { threshold: 0 }).observe(inicio);
+    }
     if (cot) {
       var verCot = new IntersectionObserver(function (entradas) {
         if (entradas[0].isIntersecting) { evento("ViewContent", { content_name: "Arma tu plan" }); verCot.disconnect(); }
@@ -566,8 +652,12 @@ const CJ_PLAN = {
   }
 
   function arrancar() {
-    try { rotulos(); pintar(); eventos(); preguntas(); calendario(); }
-    finally { movimiento(); }
+    try {
+      rotulos();
+      if (deLaDireccion()) cambio(); else pintar();   // llegar con una cantidad o con Speak ya es armar el plan
+      eventos(); preguntas(); calendario();
+    }
+    finally { menu(); pestanas(); movimiento(); }
   }
   if (d.readyState === "loading") d.addEventListener("DOMContentLoaded", arrancar); else arrancar();
 
