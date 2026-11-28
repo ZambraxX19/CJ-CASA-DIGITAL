@@ -93,10 +93,20 @@
 
 <section class="sec sec-cab t-oscuro" id="cabecera">
   <div class="caja">
-    <p class="etq"><span class="raya"></span>Planes y precios</p>
-    <h1 class="tit t-h2">Planes de contenido, con precio a la vista</h1>
-    <p class="sub">Plan 8, 12 o 15. Con solo contenidos o completo. Armas el tuyo y ves el total antes de escribirnos.</p>
-    <a class="enlace-ir" href="/portafolios/cj-planes-de-contenido.pdf" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-portada"/></svg> Ver el PDF de planes de contenido</a>
+    <div class="cab-red">
+      <div class="cab-txt">
+      <p class="etq"><span class="raya"></span>Planes y precios</p>
+      <h1 class="tit t-h2">Planes de contenido, con precio a la vista</h1>
+      <p class="sub">Plan 8, 12 o 15. Con solo contenidos o completo. Armas el tuyo y ves el total antes de escribirnos.</p>
+      <a class="enlace-ir" href="/portafolios/cj-planes-de-contenido.pdf" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-portada"/></svg> Ver el PDF de planes de contenido</a>
+      </div>
+      <picture class="cab-img">
+        <source media="(min-width: 1000px)" type="image/avif" srcset="/assets/img/sitio/01-planes-cabecera-800-v1.avif 800w, /assets/img/sitio/01-planes-cabecera-1200-v1.avif 1200w" sizes="520px">
+        <source media="(min-width: 1000px)" type="image/webp" srcset="/assets/img/sitio/01-planes-cabecera-800-v1.webp 800w, /assets/img/sitio/01-planes-cabecera-1200-v1.webp 1200w" sizes="520px">
+        <source media="(min-width: 1000px)" srcset="/assets/img/sitio/01-planes-cabecera-800-v1.jpg">
+        <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Un set de grabación visto desde atrás de una persona: un camarógrafo, dos luces y un sillón morado frente a una pared verde." width="1200" height="675" decoding="async">
+      </picture>
+    </div>
     <div class="franja" id="contenido">
       <h2>Un contenido es una pieza lista para publicar</h2>
       <ul>
@@ -227,7 +237,7 @@
           <div class="ia-fila" id="ia-fila" role="group" aria-labelledby="c-ia">
             <p class="ia-q" id="c-ia"><span class="ficha-t ia" aria-hidden="true"><svg class="ic"><use href="#i-chispa"/></svg></span>¿Cuántos de tus videos quieres con IA?</p>
             <div class="ia-linea">
-              <p class="ia-nota">Los hacemos con inteligencia artificial: tú no los grabas. Cada uno suma <span data-p="videoIA">$250.000</span>.</p>
+              <p class="ia-nota">Los hacemos con inteligencia artificial: tú no los grabas. Cada uno suma <span data-p="videoIA">$250.000</span>. <a href="/#videos-ia" target="_blank" rel="noopener">Mira cómo se ven</a></p>
               <span class="paso-a-paso">
                 <button type="button" class="pp" id="ia-menos" aria-label="Quitar un video con IA" disabled><svg class="ic" aria-hidden="true"><use href="#i-menos"/></svg></button>
                 <output class="pp-v" id="n-ia" aria-live="off">0</output>
@@ -516,6 +526,7 @@
       <!-- PENDIENTE: razón social, NIT, política de tratamiento de datos y términos -->
       <p>© 2026</p>
     </div>
+    <p class="pie-ia">Las imágenes y los videos de este sitio los hicimos con IA.</p>
   </div>
 </footer>
 <!-- ===== FIN DEL BLOQUE COMPARTIDO · PIE ===== -->

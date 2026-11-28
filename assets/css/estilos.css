@@ -672,7 +672,6 @@ html:not(.js) button.menu-btn { display: none; }   /* sin JavaScript queda el en
 .buscas-red { display: grid; gap: 8px; margin-top: 14px; }
 .busca { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 4px 12px; align-items: start; height: 100%; padding: 14px 14px 12px; border-radius: 16px;
          background: var(--panel); border: 1.5px solid transparent; text-decoration: none; transition: border-color .18s ease, background-color .18s ease; }
-.busca > .ic { width: 26px; height: 26px; margin-top: 1px; color: var(--acido); }
 .busca-t { display: flex; flex-direction: column; gap: 3px; }
 .busca-t b { font-size: 1.0625rem; line-height: 1.25; }
 .busca-t > span { font-size: .875rem; line-height: 1.4; color: var(--fg2); }
@@ -788,7 +787,6 @@ html:not(.js) button.menu-btn { display: none; }   /* sin JavaScript queda el en
   .sec-cab { padding: calc(var(--barra) + 64px) 0 56px; }
   .buscas-red { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
   .busca { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; gap: 10px; padding: 18px 16px 14px; }
-  .busca > .ic { width: 30px; height: 30px; }
   .busca-ir { grid-column: 1; }
   .tres { margin: 36px 0 32px; }
   .tres h3 { font-size: 1.3125rem; }
@@ -829,4 +827,110 @@ html:not(.js) button.menu-btn { display: none; }   /* sin JavaScript queda el en
   .completo .btn, .resumen .btn { white-space: normal; }
   .chip-t b { overflow-wrap: anywhere; }
 }
+
+/* ==================================================================================================
+   IMÁGENES Y VIDEOS. Regla: la imagen va en su caja, con el texto al lado o debajo; nunca detrás de un texto.
+   Cada <img> trae width y height (reserva su espacio) y la caja fija la proporción con aspect-ratio.
+   ================================================================================================== */
+picture { display: block; }
+picture img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* Tiras que se deslizan en celular (los tres pasos): solo CSS, sin flechas. La página no se desborda. */
+@media (max-width: 759px) {
+  .tira { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: -20px; padding-inline: 20px; scroll-padding-inline: 20px; }
+  .tira::-webkit-scrollbar { display: none; }
+  .tira > * { flex: 0 0 264px; scroll-snap-align: start; }
+}
+.tira:focus-visible { outline-offset: 6px; }
+
+/* ---------- Inicio: tarjetas "¿Qué buscas?" con imagen ---------- */
+.busca { grid-template-columns: 96px minmax(0, 1fr); column-gap: 14px; }
+.busca-img { grid-row: 1 / span 2; width: 96px; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: var(--verde); }
+.busca.destacada { grid-template-columns: minmax(0, 1fr); row-gap: 10px; }
+.busca.destacada .busca-img { grid-row: auto; width: 100%; aspect-ratio: 16 / 9; }
+.busca.destacada .busca-ir { grid-column: 1; }
+
+/* ---------- Inicio: los tres pasos con imagen ---------- */
+.tres li { grid-template-columns: 44px minmax(0, 1fr); }
+.tres li picture { grid-column: 1 / -1; aspect-ratio: 3 / 2; border-radius: 12px; overflow: hidden; margin-bottom: 14px; background: var(--vacio); }
+.tres .n { grid-row: auto / span 2; }
+
+/* ---------- Videos con IA ---------- */
+#videos-ia .cuerpo { margin-top: 12px; max-width: 34em; }
+.vids { display: grid; gap: 26px; margin: 28px 0 30px; }
+.vid-marco { position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: var(--panel); }
+.vid-marco:focus-within { outline: 3px solid var(--acido); outline-offset: 3px; }   /* el foco de los controles del navegador, a la vista */
+.vid-marco video { display: block; width: 100%; height: 100%; object-fit: cover; background: #000; }
+.vid-play { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; border: 0; border-radius: 50%; background: var(--acido); color: var(--verde);
+            box-shadow: 0 0 0 6px rgba(1,18,11,.6); display: flex; align-items: center; justify-content: center; transition: transform .18s ease; }
+.vid-play[hidden] { display: none; }
+.vid-play svg { width: 30px; height: 30px; fill: currentColor; margin-left: 3px; }
+.vid-play:hover { transform: scale(1.08); }
+.vid-play:focus-visible { outline: 3px solid #fff; outline-offset: 8px; }
+.vid figcaption { margin-top: 12px; }
+.vid h3 { font-size: 1.125rem; line-height: 1.25; }
+.vid-meta { font-size: .8125rem; font-weight: 600; letter-spacing: .02em; color: var(--acido); margin-top: 2px; }
+.vid figcaption p:last-child { font-size: .9375rem; line-height: 1.42; color: var(--fg2); margin-top: 6px; }
+
+/* ---------- Planes y precios: imagen de la cabecera, solo desde 1000 px (por debajo ni se muestra ni se pide) ---------- */
+.cab-img { display: none; }
+.ia-nota a { color: var(--acido); font-weight: 700; }
+
+/* ---------- Cómo funciona: las tres imágenes del proceso ---------- */
+.proc-imgs { margin-top: 22px; }
+.proc-imgs picture { aspect-ratio: 3 / 2; border-radius: 14px; overflow: hidden; background: var(--vacio); }
+.proc-imgs figcaption { font-size: .875rem; font-weight: 600; margin-top: 8px; }
+
+/* ---------- Otros servicios ---------- */
+.serv-img { width: 100%; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden; background: var(--vacio); }
+.speak-img { aspect-ratio: 3 / 2; border-radius: 18px; overflow: hidden; margin-top: 26px; background: var(--panel); }
+.speak-img + .speaks { margin-top: 12px; }
+.ia-cab .enlace-ir { margin-top: 6px; }
+
+/* ---------- Portafolios: la portada real de cada PDF ---------- */
+.porta { display: grid; grid-template-columns: 96px minmax(0, 1fr); column-gap: 14px; align-items: start; }
+.porta-img { grid-row: 1 / span 4; width: 96px; aspect-ratio: 640 / 906; border-radius: 6px; overflow: hidden; border: 1px solid rgba(1,18,11,.3); }
+.porta > :not(.porta-img) { grid-column: 2; }
+.porta h2 { margin-top: 0; }
+.porta .btn { margin-top: 4px; }
+
+/* ---------- Pie: la nota de que las imágenes y los videos son hechos con IA ---------- */
+.pie-ia { margin-top: 14px; font-size: .8125rem; line-height: 1.4; color: rgba(255,255,255,.84); }
+
+@media (min-width: 600px) {
+  .busca, .busca.destacada { grid-template-columns: 104px minmax(0, 1fr); row-gap: 4px; }
+  .busca-img, .busca.destacada .busca-img { grid-row: 1 / span 2; width: 104px; aspect-ratio: 1; }
+  .busca.destacada .busca-ir { grid-column: 2; }
+}
+@media (min-width: 700px) { .vids { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 22px; } }
+@media (min-width: 760px) {
+  .tres li { grid-template-columns: 1fr; }
+  .tres li picture { margin-bottom: 16px; }
+  .tres .n { grid-row: auto; }
+  .proc-imgs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+}
+@media (min-width: 1000px) {
+  .busca, .busca.destacada { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr auto; row-gap: 10px; padding: 12px 12px 12px; }
+  .busca-img, .busca.destacada .busca-img { grid-row: auto; width: 100%; aspect-ratio: 4 / 3; }
+  .busca-t, .busca-ir { padding-inline: 4px; }
+  .busca.destacada .busca-ir { grid-column: 1; }
+  .vids { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 40px 0 36px; }
+  .vid h3 { font-size: 1.25rem; }
+  .cab-red { display: grid; grid-template-columns: minmax(0, 1fr) 520px; gap: 48px; align-items: center; }
+  .cab-img { display: block; aspect-ratio: 16 / 9; border-radius: 18px; overflow: hidden; background: var(--panel); }
+  .proc-imgs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 32px; }
+  .proc-imgs .grande { grid-column: 1 / -1; order: -1; }
+  .serv-img { border-radius: 12px; }
+  .speak-img { margin-top: 0; }
+  .speak-img + .speaks { margin-top: 14px; }
+  .pie-ia { margin-top: 10px; }
+}
+@media (min-width: 1200px) {
+  .porta { display: flex; }
+  .porta-img { width: 100%; }
+  .porta h2 { margin-top: 16px; }
+  .porta .btn { margin-top: auto; }
+}
+@media (max-width: 359px) { .tira > * { flex-basis: 236px; } }
+@media (prefers-reduced-motion: reduce) { .tira { scroll-behavior: auto; } }
 

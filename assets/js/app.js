@@ -586,6 +586,32 @@ const CJ_PLAN = {
     partes.forEach(function (parte) { if (parte) obs.observe(parte); });
   }
 
+  /* ---------- Videos ----------
+     Sin JavaScript funcionan con los controles del navegador. Aquí se agrega el botón grande de reproducir,
+     que al reproducir uno se pausen los demás, y la medición. El video no se pide hasta que la persona reproduce (preload="none"). */
+  function videos() {
+    var lista = todos("video[data-video]");
+    lista.forEach(function (v) {
+      var boton = v.parentNode.querySelector(".vid-play"), medido = false;
+      if (boton) {
+        boton.hidden = false;
+        v.controls = false;   // hasta reproducir, el único control es el botón grande (menos paradas para el teclado)
+        boton.addEventListener("click", function () {
+          v.controls = true;
+          var promesa = v.play();
+          if (promesa && promesa.catch) promesa.catch(function () {});
+          v.focus({ preventScroll: true });
+        });
+      }
+      v.addEventListener("play", function () {
+        if (boton) boton.hidden = true;
+        v.controls = true;
+        lista.forEach(function (otro) { if (otro !== v && !otro.paused) otro.pause(); });
+        if (!medido) { medido = true; evento("VideoReproducido", { content_name: v.getAttribute("data-video") }, true); }
+      });
+    });
+  }
+
   /* ---------- Preguntas ---------- */
   function preguntas() {
     todos(".faq-b").forEach(function (b) {
@@ -672,7 +698,7 @@ const CJ_PLAN = {
     try {
       rotulos();
       if (deLaDireccion()) cambio(); else pintar();   // llegar con una cantidad o con Speak ya es armar el plan
-      eventos(); preguntas(); calendario();
+      eventos(); preguntas(); calendario(); videos();
     }
     finally { menu(); pestanas(); movimiento(); anclaExacta(); }
   }

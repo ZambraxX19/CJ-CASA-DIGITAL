@@ -332,15 +332,15 @@ function vigilar(page) {
       const r = await page.evaluate(() => {
         const vista = document.documentElement.clientWidth, fuera = [];
         document.querySelectorAll("body *").forEach((el) => {
-          if (el.closest(".oculto, .sr, .salto, symbol, .pestanas ul, [hidden], .menu") || el.tagName === "INPUT") return;
+          if (el.closest(".oculto, .sr, .salto, symbol, .pestanas ul, .tira, [hidden], .menu") || el.tagName === "INPUT") return;
           const c = el.getBoundingClientRect(); if (!c.width || !c.height) return;
           if (c.right > vista + 0.5 || c.left < -0.5) fuera.push(el.tagName.toLowerCase() + "." + (el.className.baseVal == null ? el.className : el.className.baseVal));
         });
         document.querySelectorAll(".caja:not(.pestanas ul), .bloque, .completo, .op, .resumen, .resumen-nombre, .resumen-total, .plan, .plan-precios, .pie-datos, .pie-col, .serv, .servs, .busca, .tres li, .franja, .speak, .sc-caja, .giro, .garantia, .garantia-linea, .no-incluye, .chip, .atajo, .btn, .contador, .ia-linea, .plan-barra-t, .barra-in, .pasos li, .lista li, .faq-b, .cal-pie").forEach((c) => {
           const rc = c.getBoundingClientRect(); if (!rc.width) return;
-          c.querySelectorAll("*").forEach((el) => { if (el.closest(".sr, [hidden], .menu") || el.tagName === "INPUT") return; const r = el.getBoundingClientRect(); if (r.width && r.height && (r.right > rc.right + 1 || r.left < rc.left - 1)) fuera.push("se sale de ." + c.className.split(" ")[0] + ": " + (el.textContent || "").trim().slice(0, 20)); });
+          c.querySelectorAll("*").forEach((el) => { if (el.closest(".sr, [hidden], .menu, .tira") || el.tagName === "INPUT") return; const r = el.getBoundingClientRect(); if (r.width && r.height && (r.right > rc.right + 1 || r.left < rc.left - 1)) fuera.push("se sale de ." + c.className.split(" ")[0] + ": " + (el.textContent || "").trim().slice(0, 20)); });
         });
-        document.querySelectorAll("h1, h2, h3, p, strong, b, dd, li, a, button, output").forEach((el) => { if (el.closest(".sr, .oculto, .salto, .pestanas ul, [hidden], .menu")) return;
+        document.querySelectorAll("h1, h2, h3, p, strong, b, dd, li, a, button, output").forEach((el) => { if (el.closest(".sr, .oculto, .salto, .pestanas ul, [hidden], .menu") || el.classList.contains("tira")) return;
           if (el.scrollWidth > el.clientWidth + 1 && getComputedStyle(el).display !== "inline" && el.clientWidth > 0) fuera.push("texto más ancho que su caja: " + (el.textContent || "").trim().slice(0, 20)); });
         return { doc: document.documentElement.scrollWidth, vista, fuera: [...new Set(fuera)].slice(0, 6) };
       });
@@ -362,7 +362,7 @@ function vigilar(page) {
       const n = await page.evaluate(() => [...document.querySelectorAll("a[href], button, input")].filter((e) => !e.disabled && e.getClientRects().length && getComputedStyle(e).visibility === "visible").length);
       for (let i = 0; i < n + 2; i++) {
         const f = await page.evaluate(() => { const e = document.activeElement; if (!e || e === document.body) return null;
-          const mostrado = e.tagName === "INPUT" ? e.nextElementSibling : e, r = mostrado.getBoundingClientRect(), c = getComputedStyle(mostrado);
+          const mostrado = e.tagName === "INPUT" ? e.nextElementSibling : e.tagName === "VIDEO" ? e.parentElement : e, r = mostrado.getBoundingClientRect(), c = getComputedStyle(mostrado);
           const arriba = Math.max(...[...document.querySelectorAll(".barra, .pestanas")].map((x) => x.getBoundingClientRect()).filter((x) => x.top <= 70 || x.top === document.getElementById("barra").getBoundingClientRect().bottom).map((x) => x.bottom));
           const fijo = document.querySelector(".plan-barra.ver, .wa-flota.ver"), fr = fijo ? fijo.getBoundingClientRect() : null;
           const enBarra = !!e.closest(".barra, .pestanas, .plan-barra, .wa-flota, .salto");
