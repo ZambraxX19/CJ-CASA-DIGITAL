@@ -7,7 +7,7 @@ en la rama `main`.
 
 | Dirección | Archivo | Qué tiene |
 |---|---|---|
-| `/` | `index.html` | Titular con precio, calendario que se puede tocar, los cinco atajos "¿Qué buscas?" y cómo funciona en tres pasos |
+| `/` | `index.html` | Titular con precio, calendario que se puede tocar, los cinco atajos "¿Qué buscas?", cómo funciona en tres pasos y los videos con IA (`/#videos-ia`) |
 | `/planes/` | `planes/index.html` | Los tres planes, **Arma tu plan** (el cotizador), qué incluye, Start Content y las preguntas |
 | `/como-funciona/` | `como-funciona/index.html` | Por qué sales tú, el proceso del mes en siete pasos y la garantía |
 | `/otros-servicios/` | `otros-servicios/index.html` | IA para tu negocio (página web, automatización, capacitación, portafolio y presentaciones) y Speak |
@@ -18,8 +18,8 @@ Además: `sitemap.xml` y `robots.txt` (si se agrega una página, se agrega al `s
 (el diseño, con la paleta y las tipografías del manual de marca), `assets/js/app.js` (un solo archivo para todas las
 páginas), `assets/fonts/` y `assets/img/`.
 
-Todas las direcciones terminan en barra (`/planes/`). `vercel.json` solo dice eso (`"trailingSlash": true`): quien
-escriba `/planes` llega a `/planes/`. Todos los enlaces y los recursos van con la ruta desde la raíz (`/assets/…`,
+Todas las direcciones terminan en barra (`/planes/`): `vercel.json` lo dice (`"trailingSlash": true`), así que quien
+escriba `/planes` llega a `/planes/`. Lo otro que trae `vercel.json` es la caché larga de los medios (ver "Imágenes y videos"). Todos los enlaces y los recursos van con la ruta desde la raíz (`/assets/…`,
 `/planes/`), así que el sitio se prueba con un servidor desde la raíz, no abriendo el archivo.
 
 ## Menú, cierre y pie: de dónde se copian
@@ -79,6 +79,32 @@ si cambia un precio, hay que volver a sacarlos.
   un guion corto en el `<head>` de `index.html` las lleva a su página nueva. Sin JavaScript, el inicio conserva esos
   `id` junto al enlace a la página nueva.
 
+## Imágenes y videos
+
+- **Dónde están:** `assets/img/sitio/` (las fotos de las páginas, las cinco imágenes 3D de las tarjetas del inicio y el
+  cuadro de espera de cada video), `assets/img/portadas/` (la página 1 de cada PDF) y `assets/video/` (los tres videos,
+  cada uno en WebM con AV1 y en MP4 con H.264, a 720p).
+- **Cómo se sacan:** con `herramientas/medios.py`, que no se publica. Recorta a la proporción de cada hueco y exporta
+  AVIF, WebP y un JPEG de respaldo en 480, 800 y 1.200 px (portadas: 220, 400 y 640), cuidando el tope de peso de cada
+  archivo. `python3 herramientas/medios.py --help` dice cómo. Las fuentes grandes (PNG de 2k, videos en 4K) no van en
+  el repo.
+- **Versión en el nombre:** todos terminan en `-v1`. `vercel.json` les pone caché de un año, así que **un archivo que
+  cambia tiene que cambiar de nombre**: se sube `VERSION` en `herramientas/medios.py`, se vuelve a exportar y se cambia
+  el nombre en el HTML. Si no, quien ya visitó el sitio sigue viendo el viejo.
+- **Portadas de los PDF:** si un PDF se vuelve a sacar, `python3 herramientas/medios.py portadas`.
+- **Pantallas con la marca:** las fotos 04, 05 y 08 traen una pantalla lisa y encima se monta una captura real con
+  `herramientas/montaje.py` (el inicio del sitio en el portátil y el celular de la 05, la portada del portafolio
+  general en la tableta de la 08 y un cuadro del video "nieve" en la 04). **La captura de la 05 muestra precios:** si
+  cambia el precio "desde" o el titular del inicio, se rehace ese montaje. Igual la 08 si cambia la portada del PDF.
+- **En el HTML:** cada imagen va en `<picture>` con su `srcset` y su `sizes`, y el `<img>` lleva `width`, `height` y
+  `alt`. Dentro de un enlace (las tarjetas del inicio) el `alt` va vacío; en las demás describe lo que se ve. Ningún
+  texto va encima de una foto. La imagen de la cabecera de `/planes/` solo existe desde 1000 px de ancho.
+- **Videos:** `preload="none"`: lo único que se descarga al cargar es el cuadro de espera. El video se pide cuando la
+  persona oprime reproducir. Sin JavaScript funcionan con los controles del navegador. El de "búnker" está cortado en
+  el segundo 22,9, antes de un llamado que solo aplica en TikTok. La primera reproducción de cada uno queda medida como
+  `VideoReproducido`.
+- En el pie de todas las páginas dice que las imágenes y los videos están hechos con IA.
+
 ## Cambiar el WhatsApp
 
 `CJ_PLAN.whatsapp` en `assets/js/app.js`, y los enlaces `https://wa.me/…` escritos en los HTML (son el respaldo sin
@@ -92,13 +118,15 @@ plan y cada clic a WhatsApp. Con el píxel apagado, esos eventos quedan en `wind
 
 ## Pruebas
 
-Están en `pruebas/` y no se publican (`.vercelignore`). Usan Playwright con Chromium: si no está instalado como módulo,
+Están en `pruebas/` y no se publican (`.vercelignore`, que también deja por fuera `herramientas/`). Usan Playwright con Chromium: si no está instalado como módulo,
 se pone su ruta en la variable `PLAYWRIGHT`. Levantan solas un servidor local desde la raíz.
 
 ```
 node pruebas/cotizador.test.js   # el cotizador de /planes/ y el calendario del inicio: precios, estados, mensajes
 node pruebas/sitio.test.js       # menú y pie idénticos, enlaces y anclas, direcciones viejas, referencia de campaña,
                                  # hamburguesa con teclado, sin JavaScript, desbordes de 320 a 1920 px, contraste, PDF
+node pruebas/medios.test.js      # imágenes y videos: huecos con alt y medidas, formatos, pesos por página y por archivo,
+                                 # que el video no se pida antes de reproducir y que reproduzca, sin JavaScript, LCP y CLS
 node pruebas/capturas.js salida/ # capturas de cada página en celular y escritorio, y cuánto mide y pesa cada una
 node pruebas/apoyo.js 4173       # solo el servidor, para ver el sitio en http://127.0.0.1:4173/
 ```
@@ -107,3 +135,6 @@ node pruebas/apoyo.js 4173       # solo el servidor, para ver el sitio en http:/
 
 En el pie hay un comentario `PENDIENTE` donde van la razón social, el NIT, la política de tratamiento de datos y los
 términos. No hay página "Nosotros": queda reservada para cuando haya contenido.
+
+El MP4 de los videos (lo que usan Safari y el iPhone) no se puede probar aquí: el navegador de las pruebas solo reproduce
+el WebM. Hay que mirarlo una vez en un iPhone.

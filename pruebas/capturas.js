@@ -30,7 +30,7 @@ const servirOtra = (raiz) => new Promise((ok) => { const s = http.createServer((
       await page.screenshot({ path: path.join(SALIDA, v.n + "-" + nombre(ruta) + "-primera-pantalla.png") });
       const m = await page.evaluate(() => ({ lcp: Math.round(window.__lcp), cls: Math.round(window.__cls * 1000) / 1000 }));
       await page.evaluate(async () => { for (let y = 0; y < document.documentElement.scrollHeight; y += 400) { window.scrollTo({ top: y, behavior: "instant" }); await new Promise((r) => setTimeout(r, 60)); } window.scrollTo({ top: 0, behavior: "instant" }); });
-      await page.waitForTimeout(2400);
+      await page.waitForLoadState("networkidle"); await page.waitForTimeout(2400);
       const alto = await page.evaluate(() => document.documentElement.scrollHeight);
       // Peso: lo que pesa en disco cada archivo que pidió la página (sin compresión del servidor)
       let peso = 0; const peticiones = pedidos.size;
@@ -49,6 +49,8 @@ const servirOtra = (raiz) => new Promise((ok) => { const s = http.createServer((
       await page.screenshot({ path: path.join(SALIDA, "celular-planes-con-barras.png") });
       await page.goto(BASE + "/otros-servicios/", { waitUntil: "networkidle" }); await page.evaluate(() => window.scrollTo({ top: 1500, behavior: "instant" })); await page.waitForTimeout(900);
       await page.screenshot({ path: path.join(SALIDA, "celular-whatsapp-flotante.png") });
+      await page.goto(BASE + "/", { waitUntil: "networkidle" }); await page.locator("#videos-ia").evaluate((e) => e.scrollIntoView({ block: "start", behavior: "instant" })); await page.waitForTimeout(1200);
+      await page.screenshot({ path: path.join(SALIDA, "celular-videos.png") });
       await page.close();
     }
     await ctx.close();

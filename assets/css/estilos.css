@@ -673,7 +673,7 @@ html:not(.js) button.menu-btn { display: none; }   /* sin JavaScript queda el en
 .busca { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 4px 12px; align-items: start; height: 100%; padding: 14px 14px 12px; border-radius: 16px;
          background: var(--panel); border: 1.5px solid transparent; text-decoration: none; transition: border-color .18s ease, background-color .18s ease; }
 .busca-t { display: flex; flex-direction: column; gap: 3px; }
-.busca-t b { font-size: 1.0625rem; line-height: 1.25; }
+.busca-t b { font-size: 1.0625rem; line-height: 1.25; overflow-wrap: anywhere; }
 .busca-t > span { font-size: .875rem; line-height: 1.4; color: var(--fg2); }
 .busca-ir { grid-column: 2; display: inline-flex; align-items: center; gap: 6px; min-height: 28px; font-size: .875rem; font-weight: 700; color: var(--acido); }
 .busca-ir .ic { width: 18px; height: 18px; transition: transform .18s ease; }
@@ -897,7 +897,8 @@ picture img { display: block; width: 100%; height: 100%; object-fit: cover; }
 /* ---------- Pie: la nota de que las imágenes y los videos son hechos con IA ---------- */
 .pie-ia { margin-top: 14px; font-size: .8125rem; line-height: 1.4; color: rgba(255,255,255,.84); }
 
-@media (min-width: 600px) {
+@media (min-width: 600px) and (max-width: 699px) { .buscas-red { grid-template-columns: 1fr; } }   /* dos columnas desde 700 px: antes el texto no cabe al lado de la miniatura */
+@media (min-width: 700px) {
   .busca, .busca.destacada { grid-template-columns: 104px minmax(0, 1fr); row-gap: 4px; }
   .busca-img, .busca.destacada .busca-img { grid-row: 1 / span 2; width: 104px; aspect-ratio: 1; }
   .busca.destacada .busca-ir { grid-column: 2; }
@@ -916,7 +917,7 @@ picture img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .busca.destacada .busca-ir { grid-column: 1; }
   .vids { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 40px 0 36px; }
   .vid h3 { font-size: 1.25rem; }
-  .cab-red { display: grid; grid-template-columns: minmax(0, 1fr) 520px; gap: 48px; align-items: center; }
+  .cab-red { display: grid; grid-template-columns: minmax(0, 1fr) 480px; gap: 48px; align-items: center; }   /* 480 y no 520: así el título sigue en dos líneas y la cabecera no crece */
   .cab-img { display: block; aspect-ratio: 16 / 9; border-radius: 18px; overflow: hidden; background: var(--panel); }
   .proc-imgs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 32px; }
   .proc-imgs .grande { grid-column: 1 / -1; order: -1; }
