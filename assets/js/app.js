@@ -651,13 +651,30 @@ const CJ_PLAN = {
     }
   }
 
+  /* Llegar con un ancla (/planes/#preguntas): al terminar de cargar las fuentes la página se acomoda y la sección
+     queda unos píxeles corrida. Se vuelve a ubicar, salvo que la persona ya haya empezado a moverse. */
+  function anclaExacta() {
+    var id = (location.hash || "").slice(1), movio = false, veces = 0;
+    if (!id) return;
+    function marca() { movio = true; }
+    ["wheel", "touchstart", "keydown", "pointerdown"].forEach(function (ev) { window.addEventListener(ev, marca, { once: true, passive: true }); });
+    function ubicar() {
+      var destino = d.getElementById(id);
+      if (!destino || movio || veces > 3) return;
+      veces++;
+      destino.scrollIntoView({ behavior: "auto", block: "start" });
+    }
+    if (d.fonts && d.fonts.ready) d.fonts.ready.then(ubicar).catch(function () {});
+    if (d.readyState === "complete") ubicar(); else window.addEventListener("load", function () { ubicar(); setTimeout(ubicar, 300); });
+  }
+
   function arrancar() {
     try {
       rotulos();
       if (deLaDireccion()) cambio(); else pintar();   // llegar con una cantidad o con Speak ya es armar el plan
       eventos(); preguntas(); calendario();
     }
-    finally { menu(); pestanas(); movimiento(); }
+    finally { menu(); pestanas(); movimiento(); anclaExacta(); }
   }
   if (d.readyState === "loading") d.addEventListener("DOMContentLoaded", arrancar); else arrancar();
 
